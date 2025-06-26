@@ -12,16 +12,16 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "symbol_placements")
 data class SymbolPlacement(
-    @field:Id
-    @field:GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @field:Column(name = "row_index", nullable = false)
+    @Column(name = "row_index", nullable = false)
     val rowIndex: Short,
 
-    @field:Column(name = "column_index", nullable = false)
+    @Column(name = "column_index", nullable = false)
     val columnIndex: Short,
 
-    @field:ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     val symbol: Symbol
 )
