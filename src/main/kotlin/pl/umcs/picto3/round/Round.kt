@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 data class Round(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long?,
 
     @ManyToOne
     val listener: Player,

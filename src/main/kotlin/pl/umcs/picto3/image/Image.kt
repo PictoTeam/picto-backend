@@ -8,7 +8,7 @@ import pl.umcs.picto3.round.Round
 data class Image(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long?,
 
     @Column(name = "file_path")
     val filePath: String,

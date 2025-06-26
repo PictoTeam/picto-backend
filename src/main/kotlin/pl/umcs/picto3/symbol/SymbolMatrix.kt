@@ -7,7 +7,7 @@ import jakarta.persistence.*
 data class SymbolMatrix(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long?,
 
     @Column(name = "row_size")
     val rowSize: Short = 3,

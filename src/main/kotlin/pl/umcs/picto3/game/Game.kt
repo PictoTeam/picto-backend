@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 data class Game(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long?,
 
     @OneToMany
     val rounds: List<Round>,

@@ -9,7 +9,7 @@ import java.util.*
 data class Player(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long?,
 
     @Column(name = "uuid")
     val uuid: UUID,
