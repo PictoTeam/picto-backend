@@ -1,6 +1,7 @@
 plugins {
 	kotlin("jvm") version "2.2.0-RC2"
 	kotlin("plugin.spring") version "2.2.0-RC2"
+	kotlin("plugin.jpa") version "2.2.0-RC2"
 	id("org.springframework.boot") version "3.5.0"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.jetbrains.dokka") version "2.0.0"
@@ -26,9 +27,11 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.postgresql:postgresql")
+	implementation("org.hibernate.orm:hibernate-core")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
