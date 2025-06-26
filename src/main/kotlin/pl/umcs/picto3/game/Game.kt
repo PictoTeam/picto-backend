@@ -15,47 +15,47 @@ data class Game(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany
     val rounds: List<Round>,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     val symbols: SymbolMatrix,
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     val images: Set<Image>,
 
-    @Column(name = "speaker_image_count", nullable = false)
+    @Column(name = "speaker_image_count")
     val speakerImageCount: Short = 4,
 
-    @Column(name = "listener_image_count", nullable = false)
+    @Column(name = "listener_image_count")
     val listenerImageCount: Short = 4,
 
-    @Column(name = "speaker_answer_time_ms", nullable = false)
+    @Column(name = "speaker_answer_time_ms")
     val speakerAnswerTime: Short = -1,
 
-    @Column(name = "listener_answer_time_ms", nullable = false)
+    @Column(name = "listener_answer_time_ms")
     val listenerAnswerTime: Short = -1,
 
-    @Column(name = "correct_answer_points", nullable = false)
+    @Column(name = "correct_answer_points")
     val correctAnswerPoints: Short = 1,
 
-    @Column(name = "wrong_answer_points", nullable = false)
+    @Column(name = "wrong_answer_points")
     val wrongAnswerPoints: Short = -1,
 
-    @Column(name = "result_screen_time_ms", nullable = false)
+    @Column(name = "result_screen_time_ms")
     val resultScreenTime: Short = 3000,
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "created_at", updatable = false)
+    val createdAt: LocalDateTime,
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "updated_at")
+    val updatedAt: LocalDateTime,
 
     @Column(name = "started_at")
-    val startedAt: LocalDateTime? = null,
+    val startedAt: LocalDateTime?,
 
     @Column(name = "ended_at")
-    val endedAt: LocalDateTime? = null,
+    val endedAt: LocalDateTime?,
 )

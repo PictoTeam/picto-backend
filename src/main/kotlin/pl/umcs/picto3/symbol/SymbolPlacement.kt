@@ -1,13 +1,6 @@
 package pl.umcs.picto3.symbol
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "symbol_placements")
@@ -16,12 +9,13 @@ data class SymbolPlacement(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Column(name = "row_index", nullable = false)
+    @Column(name = "row_index")
     val rowIndex: Short,
 
-    @Column(name = "column_index", nullable = false)
+    @Column(name = "column_index")
     val columnIndex: Short,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "symbol_id")
     val symbol: Symbol
 )

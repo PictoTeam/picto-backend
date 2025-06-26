@@ -1,6 +1,7 @@
 package pl.umcs.picto3.image
 
 import jakarta.persistence.*
+import pl.umcs.picto3.round.Round
 
 @Entity
 @Table(name = "images")
@@ -9,6 +10,12 @@ data class Image(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Column(name = "file_path", nullable = false)
-    val filePath: String
+    @Column(name = "file_path")
+    val filePath: String,
+
+    @OneToMany
+    val topics: List<Round>,
+
+    @OneToMany
+    val selectedImages: List<Round>
 )

@@ -1,7 +1,7 @@
 package pl.umcs.picto3.round
 
 import jakarta.persistence.*
-import pl.umcs.picto3.game.Game
+import org.hibernate.annotations.CreationTimestamp
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.Symbol
@@ -14,33 +14,34 @@ data class Round(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    val game: Game,
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     val listener: Player,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     val speaker: Player,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "topic_image_id")
     val topic: Image,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    val selectedImage: Image? = null,
+    @ManyToOne
+    @JoinColumn(name = "selected_image_id")
+    val selectedImage: Image?,
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany
+    @JoinColumn(name = "symbol_id")
     val selectedSymbols: List<Symbol> = emptyList(),
 
-    @Column(name = "speaker_response_time_ms", nullable = true)
-    val speakerResponseTime: Short? = null,
+    @Column(name = "speaker_response_time_ms")
+    val speakerResponseTime: Short?,
 
-    @Column(name = "listener_response_time_ms", nullable = true)
-    val listenerResponseTime: Short? = null,
+    @Column(name = "listener_response_time_ms")
+    val listenerResponseTime: Short?,
 
-    @Column(name = "started_at", nullable = false)
-    val startedAt: LocalDateTime = LocalDateTime.now(),
+    @CreationTimestamp
+    @Column(name = "started_at")
+    val startedAt: LocalDateTime,
 
     @Column(name = "ended_at")
-    val endedAt: LocalDateTime? = null
+    val endedAt: LocalDateTime?
 )
