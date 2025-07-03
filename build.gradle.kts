@@ -30,6 +30,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.liquibase:liquibase-core")
 	implementation("org.postgresql:postgresql")
 	implementation("org.hibernate.orm:hibernate-core")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
