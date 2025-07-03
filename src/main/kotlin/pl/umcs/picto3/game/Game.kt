@@ -1,8 +1,6 @@
 package pl.umcs.picto3.game
 
 import jakarta.persistence.*
-import lombok.NoArgsConstructor
-import lombok.RequiredArgsConstructor
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import pl.umcs.picto3.image.Image
