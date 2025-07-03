@@ -1,6 +1,8 @@
 package pl.umcs.picto3.game
 
 import jakarta.persistence.*
+import lombok.NoArgsConstructor
+import lombok.RequiredArgsConstructor
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import pl.umcs.picto3.image.Image
@@ -33,10 +35,10 @@ data class Game(
     val listenerImageCount: Short = 4,
 
     @Column(name = "speaker_answer_time_ms")
-    val speakerAnswerTime: Short = -1,
+    val speakerAnswerTime: Int = -1,
 
     @Column(name = "listener_answer_time_ms")
-    val listenerAnswerTime: Short = -1,
+    val listenerAnswerTime: Int = -1,
 
     @Column(name = "correct_answer_points")
     val correctAnswerPoints: Short = 1,
@@ -45,7 +47,7 @@ data class Game(
     val wrongAnswerPoints: Short = -1,
 
     @Column(name = "result_screen_time_ms")
-    val resultScreenTime: Short = 3000,
+    val resultScreenTime: Int = 3000,
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
