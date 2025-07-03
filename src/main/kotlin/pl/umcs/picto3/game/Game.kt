@@ -1,6 +1,8 @@
 package pl.umcs.picto3.game
 
 import jakarta.persistence.*
+import lombok.NoArgsConstructor
+import lombok.RequiredArgsConstructor
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import pl.umcs.picto3.image.Image
@@ -8,6 +10,8 @@ import pl.umcs.picto3.round.Round
 import pl.umcs.picto3.symbol.SymbolMatrix
 import java.time.LocalDateTime
 
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Entity
 @Table(name = "games")
 data class Game(
@@ -48,10 +52,6 @@ data class Game(
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     val createdAt: LocalDateTime,
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    val updatedAt: LocalDateTime,
 
     @Column(name = "started_at")
     val startedAt: LocalDateTime?,
