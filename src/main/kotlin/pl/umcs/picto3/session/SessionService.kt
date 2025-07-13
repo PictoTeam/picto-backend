@@ -10,6 +10,7 @@ class SessionService(
     private val activeSessions = ConcurrentHashMap<String, Session>()
 
     fun createSession(dto: SessionConfigDto): String {
+        //todo store session config separately in db
         val newCreatedSessionAccessCode = generateUniqueJoinCode()
         val newSession = sessionMapper.createSessionByConfig(dto, newCreatedSessionAccessCode)
         activeSessions[newCreatedSessionAccessCode] = newSession
