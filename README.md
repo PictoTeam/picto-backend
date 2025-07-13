@@ -18,13 +18,10 @@
 
 ### 1. heartbeat (5 sec z timeoutem):
 
--
-    1. heartbeat (usuwać z puli, jeżeli się w niej znajduje)
--
-    2. heartbeat (mogą być problemy partnera)
-- 3–5. heartbeat (próbuje przywrócić twojego partnera)
--
-    6. heartbeat (przerwanie rundy)
+- **1.** heartbeat (usuwać z puli, jeżeli się w niej znajduje)  
+- **2.** heartbeat (mogą być problemy partnera)  
+- **3–5.** heartbeat (próbuje przywrócić twojego partnera)  
+- **6.** heartbeat (przerwanie rundy)
 
 ### 2. action
 
