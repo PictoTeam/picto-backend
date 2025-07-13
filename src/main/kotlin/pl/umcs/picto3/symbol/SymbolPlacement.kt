@@ -2,7 +2,6 @@ package pl.umcs.picto3.symbol
 
 import jakarta.persistence.*
 
-@Entity
 @Table(name = "symbol_placements")
 data class SymbolPlacement(
     @Id

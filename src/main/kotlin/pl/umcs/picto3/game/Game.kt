@@ -2,14 +2,11 @@ package pl.umcs.picto3.game
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.round.Round
 import pl.umcs.picto3.symbol.SymbolMatrix
 import java.time.LocalDateTime
 
-@NoArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "games")
 data class Game(
