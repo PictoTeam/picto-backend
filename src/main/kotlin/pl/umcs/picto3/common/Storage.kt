@@ -1,4 +1,4 @@
-package pl.umcs.picto3
+package pl.umcs.picto3.common
 
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
