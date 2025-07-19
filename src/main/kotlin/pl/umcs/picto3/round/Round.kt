@@ -33,10 +33,10 @@ data class Round(
     val selectedSymbols: List<Symbol> = emptyList(),
 
     @Column(name = "speaker_response_time_ms")
-    val speakerResponseTime: Short?,
+    val speakerResponseTime: Int?,
 
     @Column(name = "listener_response_time_ms")
-    val listenerResponseTime: Short?,
+    val listenerResponseTime: Int?,
 
     @CreationTimestamp
     @Column(name = "started_at")
