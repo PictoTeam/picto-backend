@@ -2,6 +2,7 @@ package pl.umcs.picto3.session
 
 
 import pl.umcs.picto3.image.Image
+import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.SymbolMatrix
 
 data class Session(
@@ -13,5 +14,7 @@ data class Session(
     val listenerAnswerTime: Int? = null,
     val correctAnswerPoints: Short? = null,
     val wrongAnswerPoints: Short? = null,
-    val resultScreenTime: Short? = null
+    val resultScreenTime: Short? = null,
+    val accessCode: String,
+    val startingPlayers: MutableSet<Player>
 )

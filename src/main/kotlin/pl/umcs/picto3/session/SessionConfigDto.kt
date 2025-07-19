@@ -27,7 +27,7 @@ class SessionMapper(
     private val imageRepository: ImageRepository,
     private val symbolMapper: SymbolMapper
 ) {
-    fun createSessionByConfig(dto: SessionConfigDto): Session {
+    fun createSessionByConfig(dto: SessionConfigDto, accessCode: String): Session {
         return Session(
             symbols = symbolMapper.toSymbolMatrix(dto.symbols),
             images = imageRepository.findAllById(dto.imagesId).toSet(),
@@ -37,7 +37,9 @@ class SessionMapper(
             listenerAnswerTime = dto.listenerAnswerTime,
             correctAnswerPoints = dto.correctAnswerPoints,
             wrongAnswerPoints = dto.wrongAnswerPoints,
-            resultScreenTime = dto.resultScreenTime
+            resultScreenTime = dto.resultScreenTime,
+            accessCode = accessCode,
+            startingPlayers = mutableSetOf()
         )
     }
 }
