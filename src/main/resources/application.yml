@@ -11,13 +11,17 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate # For dev reasons use update only when necessary
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         jdbc:
           time_zone: UTC
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 40MB
 
 # For dev reasons
 logging:
