@@ -23,6 +23,9 @@ spring:
       max-file-size: 2MB
       max-request-size: 40MB
 
+  liquibase:
+    change-log: classpath:/db/changelog/db-changelog-master.xml
+
 # For dev reasons
 logging:
   level:
