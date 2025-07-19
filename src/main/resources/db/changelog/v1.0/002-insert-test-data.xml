@@ -25,75 +25,111 @@
 
     <changeSet id="002-insert-test-images" author="picto-dev" context="test">
         <insert tableName="images">
-            <column name="file_path" value="/images/bed.jpg"/>
+            <column name="stored_file_name" value="bed_20250719192500.jpg"/>
+            <column name="file_name" value="bed.jpg"/>
+            <column name="file_hash" value="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/cap.jpg"/>
+            <column name="stored_file_name" value="cap_20250719192500.jpg"/>
+            <column name="file_name" value="cap.jpg"/>
+            <column name="file_hash" value="f3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b856"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/cat.jpg"/>
+            <column name="stored_file_name" value="cat_20250719192500.jpg"/>
+            <column name="file_name" value="cat.jpg"/>
+            <column name="file_hash" value="g3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b857"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/church.jpg"/>
+            <column name="stored_file_name" value="church_20250719192500.jpg"/>
+            <column name="file_name" value="church.jpg"/>
+            <column name="file_hash" value="h3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b858"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/cookie.jpg"/>
+            <column name="stored_file_name" value="cookie_20250719192500.jpg"/>
+            <column name="file_name" value="cookie.jpg"/>
+            <column name="file_hash" value="i3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b859"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/cow.jpg"/>
+            <column name="stored_file_name" value="cow_20250719192500.jpg"/>
+            <column name="file_name" value="cow.jpg"/>
+            <column name="file_hash" value="j3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b860"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/creme_caramel.jpg"/>
+            <column name="stored_file_name" value="creme_caramel_20250719192500.jpg"/>
+            <column name="file_name" value="creme_caramel.jpg"/>
+            <column name="file_hash" value="k3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b861"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/hand.jpg"/>
+            <column name="stored_file_name" value="hand_20250719192500.jpg"/>
+            <column name="file_name" value="hand.jpg"/>
+            <column name="file_hash" value="l3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b862"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/hen.jpg"/>
+            <column name="stored_file_name" value="hen_20250719192500.jpg"/>
+            <column name="file_name" value="hen.jpg"/>
+            <column name="file_hash" value="m3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b863"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/house.jpg"/>
+            <column name="stored_file_name" value="house_20250719192500.jpg"/>
+            <column name="file_name" value="house.jpg"/>
+            <column name="file_hash" value="n3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b864"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/pine_tree.jpg"/>
+            <column name="stored_file_name" value="pine_tree_20250719192500.jpg"/>
+            <column name="file_name" value="pine_tree.jpg"/>
+            <column name="file_hash" value="o3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b865"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/racket.jpg"/>
+            <column name="stored_file_name" value="racket_20250719192500.jpg"/>
+            <column name="file_name" value="racket.jpg"/>
+            <column name="file_hash" value="p3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b866"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/soccer_ball.jpg"/>
+            <column name="stored_file_name" value="soccer_ball_20250719192500.jpg"/>
+            <column name="file_name" value="soccer_ball.jpg"/>
+            <column name="file_hash" value="q3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b867"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/socks.jpg"/>
+            <column name="stored_file_name" value="socks_20250719192500.jpg"/>
+            <column name="file_name" value="socks.jpg"/>
+            <column name="file_hash" value="r3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b868"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/sun.jpg"/>
+            <column name="stored_file_name" value="sun_20250719192500.jpg"/>
+            <column name="file_name" value="sun.jpg"/>
+            <column name="file_hash" value="s3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b869"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/tractor.jpg"/>
+            <column name="stored_file_name" value="tractor_20250719192500.jpg"/>
+            <column name="file_name" value="tractor.jpg"/>
+            <column name="file_hash" value="t3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b870"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/trousers.jpg"/>
+            <column name="stored_file_name" value="trousers_20250719192500.jpg"/>
+            <column name="file_name" value="trousers.jpg"/>
+            <column name="file_hash" value="u3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b871"/>
         </insert>
 
         <insert tableName="images">
-            <column name="file_path" value="/images/violin.jpg"/>
+            <column name="stored_file_name" value="violin_20250719192500.jpg"/>
+            <column name="file_name" value="violin.jpg"/>
+            <column name="file_hash" value="v3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b872"/>
         </insert>
     </changeSet>
 
