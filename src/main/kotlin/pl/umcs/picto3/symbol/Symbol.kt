@@ -9,6 +9,12 @@ data class Symbol(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
 
-    @Column(name = "file_path")
-    val filePath: String
+    @Column
+    val storedFileName: String,
+
+    @Column
+    val fileName: String,
+
+    @Column(name = "file_hash", unique = true, length = 64)
+    val fileHash: String
 )

@@ -19,7 +19,7 @@ class Storage {
 
     private val allowedExtensions = setOf("jpg", "jpeg", "png")
 
-    fun store(file: MultipartFile): String {
+    fun store(file: MultipartFile, folder: String = ""): String {
         try {
             if (file.isEmpty) {
                 throw StorageException("Failed to store empty file.")
@@ -34,13 +34,15 @@ class Storage {
             }
 
             val uuidFilename = "${UUID.randomUUID()}.$extension"
+            val targetPath = if (folder.isNotEmpty()) storagePath.resolve(folder) else storagePath
+            Files.createDirectories(targetPath)
 
-            val destinationFile = storagePath.resolve(uuidFilename)
+            val destinationFile = targetPath.resolve(uuidFilename)
 
             file.inputStream.use { inputStream ->
                 Files.copy(inputStream, destinationFile)
             }
-            return uuidFilename
+            return if (folder.isNotEmpty()) "$folder/$uuidFilename" else uuidFilename
 
         } catch (e: IOException) {
             throw StorageException("Failed to store file: ${e.message}", e)
