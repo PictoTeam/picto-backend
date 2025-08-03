@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import pl.umcs.picto3.game.GameService
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
 
 @WebMvcTest(GameConfigController::class)
@@ -27,7 +26,7 @@ class GameConfigControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     @MockitoBean
-    private lateinit var gameService: GameService
+    private lateinit var gameConfigService: GameConfigService
 
     @Test
     fun `test create game config`() {
@@ -49,7 +48,7 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameService.createGame(any())).thenReturn(gameConfigDto)
+        `when`(gameConfigService.createGame(any())).thenReturn(gameConfigDto)
         
         mockMvc.perform(post("/game-configs")
             .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +62,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameService).createGame(any())
+        verify(gameConfigService).createGame(any())
     }
     
     @Test
@@ -98,7 +97,7 @@ class GameConfigControllerTest {
             resultScreenTime = 3000
         )
         
-        `when`(gameService.getGameConfigs()).thenReturn(listOf(gameConfigDto1, gameConfigDto2))
+        `when`(gameConfigService.getGameConfigs()).thenReturn(listOf(gameConfigDto1, gameConfigDto2))
         
         mockMvc.perform(get("/game-configs"))
             .andExpect(status().isOk)
@@ -107,7 +106,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$[1].speakerImageCount").value(4))
             .andExpect(jsonPath("$[1].listenerImageCount").value(4))
         
-        verify(gameService).getGameConfigs()
+        verify(gameConfigService).getGameConfigs()
     }
     
     @Test
@@ -130,7 +129,7 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameService.getGameConfig(1L)).thenReturn(gameConfigDto)
+        `when`(gameConfigService.getGameConfig(1L)).thenReturn(gameConfigDto)
         
         mockMvc.perform(get("/game-configs/1"))
             .andExpect(status().isOk)
@@ -142,7 +141,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameService).getGameConfig(1L)
+        verify(gameConfigService).getGameConfig(1L)
     }
     
     @Test
@@ -165,7 +164,7 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameService.updateGameConfig(eq(1L), any())).thenReturn(gameConfigDto)
+        `when`(gameConfigService.updateGameConfig(eq(1L), any())).thenReturn(gameConfigDto)
         
         mockMvc.perform(post("/game-configs/1")
             .contentType(MediaType.APPLICATION_JSON)
@@ -179,7 +178,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameService).updateGameConfig(eq(1L), any())
+        verify(gameConfigService).updateGameConfig(eq(1L), any())
     }
     
     @Test
@@ -187,6 +186,6 @@ class GameConfigControllerTest {
         mockMvc.perform(delete("/game-configs/1"))
             .andExpect(status().isNoContent)
         
-        verify(gameService).deleteGameConfig(1L)
+        verify(gameConfigService).deleteGameConfig(1L)
     }
 }
