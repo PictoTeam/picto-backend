@@ -13,6 +13,7 @@ import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrix
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
 import pl.umcs.picto3.symbol.SymbolPlacementConfigDto
+import pl.umcs.picto3.symbol.SymbolService
 
 @ExtendWith(MockitoExtension::class)
 class GameConfigDtoTest {
@@ -22,6 +23,9 @@ class GameConfigDtoTest {
 
     @Mock
     private lateinit var symbolMapper: SymbolMapper
+    
+    @Mock
+    private lateinit var symbolService: SymbolService
 
     @InjectMocks
     private lateinit var gameConfigMapper: GameConfigMapper
@@ -89,7 +93,7 @@ class GameConfigDtoTest {
             Image(id = 2L, storedFileName = "test2.jpg", fileName = "Test Image 2", fileHash = "hash456")
         )
         
-        `when`(symbolMapper.toSymbolMatrix(symbolMatrixConfigDto)).thenReturn(symbolMatrix)
+        `when`(symbolService.toSymbolMatrix(symbolMatrixConfigDto)).thenReturn(symbolMatrix)
         `when`(imageRepository.findAllById(gameConfigDto.imagesId)).thenReturn(images.toList())
         
         val gameConfig = gameConfigMapper.fromDto(gameConfigDto)

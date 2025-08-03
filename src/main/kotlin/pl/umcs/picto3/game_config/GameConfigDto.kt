@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
+import pl.umcs.picto3.symbol.SymbolService
 
 data class GameConfigDto(
     @field:NotNull(message = "Symbols matrix is required")
@@ -43,12 +44,13 @@ data class GameConfigDto(
 @Component
 class GameConfigMapper(
     private val imageRepository: ImageRepository,
-    private val symbolMapper: SymbolMapper
+    private val symbolMapper: SymbolMapper,
+    private val symbolService: SymbolService
 ) {
     fun fromDto(dto: GameConfigDto, id: Long? = null): GameConfig {
         return GameConfig(
             id = id,
-            symbols = symbolMapper.toSymbolMatrix(dto.symbols),
+            symbols = symbolService.toSymbolMatrix(dto.symbols),
             images = imageRepository.findAllById(dto.imagesId).toSet(),
             speakerImageCount = dto.speakerImageCount,
             listenerImageCount = dto.listenerImageCount,
