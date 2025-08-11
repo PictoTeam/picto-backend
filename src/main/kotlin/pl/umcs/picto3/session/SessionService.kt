@@ -5,16 +5,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class SessionService(
-    private val sessionMapper: SessionMapper
 ) {
     private val activeSessions = ConcurrentHashMap<String, Session>()
 
-    fun createSession(dto: SessionConfigDto): String {
-        //todo store session config separately in db
-        val newCreatedSessionAccessCode = generateUniqueJoinCode()
-        val newSession = sessionMapper.createSessionByConfig(dto, newCreatedSessionAccessCode)
-        activeSessions[newCreatedSessionAccessCode] = newSession
-        return newCreatedSessionAccessCode
+    fun createSession(): String {
+        TODO("Implement session creation logic here")
     }
 
     private fun generateUniqueJoinCode(): String {
