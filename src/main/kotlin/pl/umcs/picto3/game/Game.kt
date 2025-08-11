@@ -2,6 +2,7 @@ package pl.umcs.picto3.game
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import pl.umcs.picto3.game_config.GameConfig
 import pl.umcs.picto3.round.Round
 import java.time.LocalDateTime
 
@@ -11,6 +12,9 @@ data class Game(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
+
+    @ManyToOne
+    val gameConfig: GameConfig,
 
     @OneToMany
     val rounds: List<Round>,
