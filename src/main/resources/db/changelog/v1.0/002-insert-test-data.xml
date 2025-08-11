@@ -135,60 +135,22 @@
 
     <changeSet id="003-insert-test-symbols" author="picto-dev" context="test">
         <insert tableName="symbols">
-            <column name="file_path" value="/symbols/circle.png"/>
+            <column name="file_path" value="symbol1.svg"/>
         </insert>
-
         <insert tableName="symbols">
-            <column name="file_path" value="/symbols/downwards_bow.png"/>
-        </insert>
-
-        <insert tableName="symbols">
-            <column name="file_path" value="/symbols/star.png"/>
-        </insert>
-
-        <insert tableName="symbols">
-            <column name="file_path" value="/symbols/three_apostrophes.png"/>
-        </insert>
-
-        <insert tableName="symbols">
-            <column name="file_path" value="/symbols/tilde.png"/>
-        </insert>
-
-        <insert tableName="symbols">
-            <column name="file_path" value="/symbols/two_apostrophes.png"/>
-        </insert>
-
-        <insert tableName="symbols">
-            <column name="file_path" value="/symbols/upwards_bow.png"/>
-        </insert>
-
-        <insert tableName="symbols">
-            <column name="file_path" value="/symbols/vertical_tilde.png"/>
+            <column name="file_path" value="symbol2.svg"/>
         </insert>
     </changeSet>
 
     <changeSet id="004-insert-test-symbol-matrices" author="picto-dev" context="test">
-        <!-- 3x3 Basic Matrix -->
         <insert tableName="symbol_matrices">
+            <column name="id" valueNumeric="1"/>
             <column name="row_size" valueNumeric="3"/>
             <column name="column_size" valueNumeric="3"/>
-        </insert>
-
-        <!-- 4x4 Advanced Matrix -->
-        <insert tableName="symbol_matrices">
-            <column name="row_size" valueNumeric="4"/>
-            <column name="column_size" valueNumeric="4"/>
-        </insert>
-
-        <!-- 2x2 Simple Matrix -->
-        <insert tableName="symbol_matrices">
-            <column name="row_size" valueNumeric="2"/>
-            <column name="column_size" valueNumeric="2"/>
         </insert>
     </changeSet>
 
     <changeSet id="005-insert-test-symbol-placements" author="picto-dev" context="test">
-        <!-- 3x3 Matrix (ID=1) Symbol Placements -->
         <insert tableName="symbol_placements">
             <column name="row_index" valueNumeric="0"/>
             <column name="column_index" valueNumeric="0"/>
@@ -201,284 +163,60 @@
             <column name="symbol_id" valueNumeric="2"/>
             <column name="symbol_matrix_id" valueNumeric="1"/>
         </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="0"/>
-            <column name="column_index" valueNumeric="2"/>
-            <column name="symbol_id" valueNumeric="3"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="1"/>
-            <column name="column_index" valueNumeric="0"/>
-            <column name="symbol_id" valueNumeric="4"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="1"/>
-            <column name="column_index" valueNumeric="1"/>
-            <column name="symbol_id" valueNumeric="5"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="1"/>
-            <column name="column_index" valueNumeric="2"/>
-            <column name="symbol_id" valueNumeric="6"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="2"/>
-            <column name="column_index" valueNumeric="0"/>
-            <column name="symbol_id" valueNumeric="7"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="2"/>
-            <column name="column_index" valueNumeric="1"/>
-            <column name="symbol_id" valueNumeric="8"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="2"/>
-            <column name="column_index" valueNumeric="2"/>
-            <column name="symbol_id" valueNumeric="1"/>
-            <column name="symbol_matrix_id" valueNumeric="1"/>
-        </insert>
-
-        <!-- 2x2 Matrix (ID=3) Symbol Placements -->
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="0"/>
-            <column name="column_index" valueNumeric="0"/>
-            <column name="symbol_id" valueNumeric="3"/>
-            <column name="symbol_matrix_id" valueNumeric="3"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="0"/>
-            <column name="column_index" valueNumeric="1"/>
-            <column name="symbol_id" valueNumeric="4"/>
-            <column name="symbol_matrix_id" valueNumeric="3"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="1"/>
-            <column name="column_index" valueNumeric="0"/>
-            <column name="symbol_id" valueNumeric="6"/>
-            <column name="symbol_matrix_id" valueNumeric="3"/>
-        </insert>
-        <insert tableName="symbol_placements">
-            <column name="row_index" valueNumeric="1"/>
-            <column name="column_index" valueNumeric="1"/>
-            <column name="symbol_id" valueNumeric="1"/>
-            <column name="symbol_matrix_id" valueNumeric="3"/>
-        </insert>
     </changeSet>
 
-    <changeSet id="006-insert-test-games" author="picto-dev" context="test">
-        <insert tableName="games">
+    <changeSet id="006-insert-test-game-configs" author="picto-dev" context="test">
+        <insert tableName="game_configs">
             <column name="symbols_id" valueNumeric="1"/>
             <column name="speaker_image_count" valueNumeric="4"/>
             <column name="listener_image_count" valueNumeric="4"/>
-            <column name="speaker_answer_time_ms" valueNumeric="30000"/>
-            <column name="listener_answer_time_ms" valueNumeric="20000"/>
-            <column name="correct_answer_points" valueNumeric="10"/>
-            <column name="wrong_answer_points" valueNumeric="-5"/>
+            <column name="speaker_answer_time_ms" valueNumeric="10000"/>
+            <column name="listener_answer_time_ms" valueNumeric="10000"/>
+            <column name="correct_answer_points" valueNumeric="1"/>
+            <column name="wrong_answer_points" valueNumeric="-1"/>
             <column name="result_screen_time_ms" valueNumeric="3000"/>
-            <column name="started_at" value="2024-12-01 10:00:00"/>
-            <column name="ended_at" value="2024-12-01 10:15:30"/>
-        </insert>
-
-        <insert tableName="games">
-            <column name="symbols_id" valueNumeric="3"/>
-            <column name="speaker_image_count" valueNumeric="6"/>
-            <column name="listener_image_count" valueNumeric="6"/>
-            <column name="speaker_answer_time_ms" valueNumeric="45000"/>
-            <column name="listener_answer_time_ms" valueNumeric="30000"/>
-            <column name="correct_answer_points" valueNumeric="15"/>
-            <column name="wrong_answer_points" valueNumeric="-3"/>
-            <column name="result_screen_time_ms" valueNumeric="5000"/>
-            <column name="started_at" value="2024-12-01 14:30:00"/>
-        </insert>
-
-        <insert tableName="games">
-            <column name="symbols_id" valueNumeric="1"/>
-            <column name="speaker_image_count" valueNumeric="8"/>
-            <column name="listener_image_count" valueNumeric="8"/>
-            <column name="speaker_answer_time_ms" valueNumeric="-1"/>
-            <column name="listener_answer_time_ms" valueNumeric="-1"/>
-            <column name="correct_answer_points" valueNumeric="20"/>
-            <column name="wrong_answer_points" valueNumeric="-10"/>
-            <column name="result_screen_time_ms" valueNumeric="2000"/>
+            <column name="created_at" valueDate="2025-08-11T10:00:00"/>
         </insert>
     </changeSet>
 
-    <changeSet id="007-insert-test-game-images" author="picto-dev" context="test">
-        <!-- Game 1 Images -->
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="1"/>
+    <changeSet id="007-insert-test-game-configs-images" author="picto-dev" context="test">
+        <insert tableName="game_configs_images">
+            <column name="game_config_id" valueNumeric="1"/>
             <column name="image_id" valueNumeric="1"/>
         </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="1"/>
+        <insert tableName="game_configs_images">
+            <column name="game_config_id" valueNumeric="1"/>
             <column name="image_id" valueNumeric="2"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="1"/>
-            <column name="image_id" valueNumeric="3"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="1"/>
-            <column name="image_id" valueNumeric="4"/>
-        </insert>
-
-        <!-- Game 2 Images -->
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="2"/>
-            <column name="image_id" valueNumeric="5"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="2"/>
-            <column name="image_id" valueNumeric="6"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="2"/>
-            <column name="image_id" valueNumeric="7"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="2"/>
-            <column name="image_id" valueNumeric="8"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="2"/>
-            <column name="image_id" valueNumeric="9"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="2"/>
-            <column name="image_id" valueNumeric="10"/>
-        </insert>
-
-        <!-- Game 3 Images (all images for variety) -->
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="2"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="3"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="4"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="5"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="6"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="7"/>
-        </insert>
-        <insert tableName="games_images">
-            <column name="game_id" valueNumeric="3"/>
-            <column name="image_id" valueNumeric="8"/>
         </insert>
     </changeSet>
 
-    <changeSet id="008-insert-test-rounds" author="picto-dev" context="test">
-        <!-- Game 1 Rounds -->
+    <changeSet id="008-insert-test-games" author="picto-dev" context="test">
+        <insert tableName="games">
+            <column name="created_at" valueDate="2025-08-11T10:00:00"/>
+            <column name="started_at" valueDate="2025-08-11T10:05:00"/>
+            <column name="ended_at" valueDate="2025-08-11T10:10:00"/>
+            <column name="game_config_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="009-insert-test-rounds" author="picto-dev" context="test">
         <insert tableName="rounds">
+            <column name="game_id" valueNumeric="1"/>
             <column name="listener_id" valueNumeric="1"/>
             <column name="speaker_id" valueNumeric="2"/>
             <column name="topic_image_id" valueNumeric="1"/>
-            <column name="selected_image_id" valueNumeric="1"/>
-            <column name="speaker_response_time_ms" valueNumeric="15000"/>
-            <column name="listener_response_time_ms" valueNumeric="8000"/>
-            <column name="started_at" value="2024-12-01 10:02:00"/>
-            <column name="ended_at" value="2024-12-01 10:02:30"/>
-            <column name="game_id" valueNumeric="1"/>
-        </insert>
-
-        <insert tableName="rounds">
-            <column name="listener_id" valueNumeric="2"/>
-            <column name="speaker_id" valueNumeric="1"/>
-            <column name="topic_image_id" valueNumeric="2"/>
-            <column name="selected_image_id" valueNumeric="3"/>
-            <column name="speaker_response_time_ms" valueNumeric="20000"/>
-            <column name="listener_response_time_ms" valueNumeric="12000"/>
-            <column name="started_at" value="2024-12-01 10:05:00"/>
-            <column name="ended_at" value="2024-12-01 10:05:45"/>
-            <column name="game_id" valueNumeric="1"/>
-        </insert>
-
-        <!-- Game 2 Rounds -->
-        <insert tableName="rounds">
-            <column name="listener_id" valueNumeric="3"/>
-            <column name="speaker_id" valueNumeric="4"/>
-            <column name="topic_image_id" valueNumeric="7"/>
-            <column name="selected_image_id" valueNumeric="7"/>
-            <column name="speaker_response_time_ms" valueNumeric="25000"/>
-            <column name="listener_response_time_ms" valueNumeric="18000"/>
-            <column name="started_at" value="2024-12-01 14:32:00"/>
-            <column name="ended_at" value="2024-12-01 14:33:15"/>
-            <column name="game_id" valueNumeric="2"/>
-        </insert>
-
-        <!-- Game 3 Round (ongoing) -->
-        <insert tableName="rounds">
-            <column name="listener_id" valueNumeric="1"/>
-            <column name="speaker_id" valueNumeric="3"/>
-            <column name="topic_image_id" valueNumeric="5"/>
-            <column name="selected_image_id"/>
-            <column name="speaker_response_time_ms"/>
-            <column name="listener_response_time_ms"/>
-            <column name="started_at" value="2024-12-01 16:00:00"/>
-            <column name="ended_at"/>
-            <column name="game_id" valueNumeric="3"/>
+            <column name="selected_image_id" valueNumeric="2"/>
+            <column name="speaker_response_time_ms" valueNumeric="1000"/>
+            <column name="listener_response_time_ms" valueNumeric="1200"/>
+            <column name="started_at" valueDate="2025-08-11T10:05:00"/>
+            <column name="ended_at" valueDate="2025-08-11T10:06:00"/>
         </insert>
     </changeSet>
 
-    <changeSet id="009-insert-test-round-symbols" author="picto-dev" context="test">
-        <!-- Round 1 Selected Symbols -->
+    <changeSet id="010-insert-test-rounds-symbols" author="picto-dev" context="test">
         <insert tableName="rounds_symbols">
             <column name="round_id" valueNumeric="1"/>
             <column name="symbol_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="1"/>
-            <column name="symbol_id" valueNumeric="5"/>
-        </insert>
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="1"/>
-            <column name="symbol_id" valueNumeric="2"/>
-        </insert>
-
-        <!-- Round 2 Selected Symbols -->
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="2"/>
-            <column name="symbol_id" valueNumeric="2"/>
-        </insert>
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="2"/>
-            <column name="symbol_id" valueNumeric="6"/>
-        </insert>
-
-        <!-- Round 3 Selected Symbols -->
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="3"/>
-            <column name="symbol_id" valueNumeric="3"/>
-        </insert>
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="3"/>
-            <column name="symbol_id" valueNumeric="7"/>
-        </insert>
-        <insert tableName="rounds_symbols">
-            <column name="round_id" valueNumeric="3"/>
-            <column name="symbol_id" valueNumeric="4"/>
         </insert>
     </changeSet>
 
