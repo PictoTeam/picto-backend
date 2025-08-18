@@ -1,7 +1,7 @@
 package pl.umcs.picto3.session
 
 
-import pl.umcs.picto3.game_config.GameConfig
+import pl.umcs.picto3.gameconfig.GameConfig
 import pl.umcs.picto3.player.Player
 
 data class Session(

@@ -1,7 +1,7 @@
 package pl.umcs.picto3.game
 
 import org.springframework.stereotype.Service
-import pl.umcs.picto3.game_config.GameConfigDto
+import pl.umcs.picto3.gameconfig.GameConfigDto
 
 @Service
 class GameService() {

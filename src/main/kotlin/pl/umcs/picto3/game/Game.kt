@@ -2,7 +2,7 @@ package pl.umcs.picto3.game
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
-import pl.umcs.picto3.game_config.GameConfig
+import pl.umcs.picto3.gameconfig.GameConfig
 import pl.umcs.picto3.round.Round
 import java.time.LocalDateTime
 
