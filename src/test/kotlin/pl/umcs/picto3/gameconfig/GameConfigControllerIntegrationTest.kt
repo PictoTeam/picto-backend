@@ -1,4 +1,4 @@
-package pl.umcs.picto3.game_config
+package pl.umcs.picto3.gameconfig
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
@@ -19,7 +19,6 @@ import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrix
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
 import pl.umcs.picto3.symbol.SymbolMatrixRepository
-import pl.umcs.picto3.symbol.SymbolPlacement
 import pl.umcs.picto3.symbol.SymbolPlacementConfigDto
 import pl.umcs.picto3.symbol.SymbolPlacementRepository
 import pl.umcs.picto3.symbol.SymbolRepository

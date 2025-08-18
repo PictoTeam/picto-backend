@@ -1,10 +1,9 @@
-package pl.umcs.picto3.game_config
+package pl.umcs.picto3.gameconfig
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.symbol.SymbolMatrix
-import pl.umcs.picto3.symbol.SymbolPlacement
 import java.time.LocalDateTime
 
 class GameConfigTest {

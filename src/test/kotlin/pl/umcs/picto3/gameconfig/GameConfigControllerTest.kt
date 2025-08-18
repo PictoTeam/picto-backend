@@ -1,4 +1,4 @@
-package pl.umcs.picto3.game_config
+package pl.umcs.picto3.gameconfig
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test

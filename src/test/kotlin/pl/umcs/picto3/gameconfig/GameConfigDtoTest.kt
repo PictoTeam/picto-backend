@@ -1,4 +1,4 @@
-package pl.umcs.picto3.game_config
+package pl.umcs.picto3.gameconfig
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -12,7 +12,6 @@ import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrix
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
-import pl.umcs.picto3.symbol.SymbolPlacementConfigDto
 import pl.umcs.picto3.symbol.SymbolService
 
 @ExtendWith(MockitoExtension::class)
@@ -96,7 +95,7 @@ class GameConfigDtoTest {
         `when`(symbolService.toSymbolMatrix(symbolMatrixConfigDto)).thenReturn(symbolMatrix)
         `when`(imageRepository.findAllById(gameConfigDto.imagesId)).thenReturn(images.toList())
         
-        val gameConfig = gameConfigMapper.fromDto(gameConfigDto)
+        val gameConfig = gameConfigMapper.toGameConfig(gameConfigDto)
         
         assertNull(gameConfig.id)
         assertEquals(symbolMatrix, gameConfig.symbols)

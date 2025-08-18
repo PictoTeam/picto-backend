@@ -1,4 +1,4 @@
-package pl.umcs.picto3.game_config
+package pl.umcs.picto3.gameconfig
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.symbol.SymbolMatrix
-import java.time.LocalDateTime
 
 @DataJpaTest
 class GameConfigRepositoryTest {
