@@ -39,7 +39,9 @@ class GameConfigRepositoryIntegrationTest {
     fun `test save and retrieve game config with relationships`() {
         val symbol = Symbol(
             id = null,
-            filePath = "symbols/circle.png"
+            storedFileName = "circle.png",
+            fileName = "Circle",
+            fileHash = "hash-symbol-circle"
         )
         val savedSymbol = symbolRepository.save(symbol)
 

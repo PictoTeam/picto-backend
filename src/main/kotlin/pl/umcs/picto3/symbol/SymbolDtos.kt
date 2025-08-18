@@ -16,8 +16,6 @@ data class SymbolPlacementConfigDto(
 
 @Component
 class SymbolMapper(
-    private val symbolMatrixRepository: SymbolMatrixRepository,
-    private val symbolPlacementRepository: SymbolPlacementRepository,
     private val symbolRepository: SymbolRepository
 ) {
     fun toSymbolMatrix(dto: SymbolMatrixConfigDto): SymbolMatrix {
@@ -32,14 +30,11 @@ class SymbolMapper(
         )
     }
 
-    fun toSymbolPlacement(dto: SymbolPlacementConfigDto): SymbolPlacement {
-        val symbol = symbolRepository.getReferenceById(dto.symbolId)
-
-        return SymbolPlacement(
-            id = null,
-            rowIndex = dto.rowIndex,
-            columnIndex = dto.columnIndex,
-            symbol = symbol
+    fun toSymbolPlacementConfigDto(symbolPlacement: SymbolPlacement): SymbolPlacementConfigDto {
+        return SymbolPlacementConfigDto(
+            rowIndex = symbolPlacement.rowIndex,
+            columnIndex = symbolPlacement.columnIndex,
+            symbolId = symbolPlacement.symbol.id!!
         )
     }
 
@@ -54,11 +49,14 @@ class SymbolMapper(
         )
     }
 
-    fun toSymbolPlacementConfigDto(symbolPlacement: SymbolPlacement): SymbolPlacementConfigDto {
-        return SymbolPlacementConfigDto(
-            rowIndex = symbolPlacement.rowIndex,
-            columnIndex = symbolPlacement.columnIndex,
-            symbolId = symbolPlacement.symbol.id!!
+    fun toSymbolPlacement(dto: SymbolPlacementConfigDto): SymbolPlacement {
+        val symbol = symbolRepository.getReferenceById(dto.symbolId)
+
+        return SymbolPlacement(
+            id = null,
+            rowIndex = dto.rowIndex,
+            columnIndex = dto.columnIndex,
+            symbol = symbol
         )
     }
 }

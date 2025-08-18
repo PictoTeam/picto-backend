@@ -19,7 +19,7 @@ class ImageController(
         @RequestParam("file") files: List<MultipartFile>,
         @RequestParam("names") names: List<String>,
     ): ResponseEntity<String> {
-        storageService.uploadBatch(files, names)
+        storageService.uploadBatchImages(files, names)
         return ResponseEntity.ok("Files uploaded successfully")
     }
 

@@ -17,6 +17,11 @@ data class GameConfig(
     val symbols: SymbolMatrix,
 
     @ManyToMany
+    @JoinTable(
+        name = "game_configs_images",
+        joinColumns = [JoinColumn(name = "game_config_id")],
+        inverseJoinColumns = [JoinColumn(name = "image_id")]
+    )
     val images: Set<Image>,
 
     @Column(name = "speaker_image_count")

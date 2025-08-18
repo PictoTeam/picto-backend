@@ -36,8 +36,14 @@
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="file_path" type="VARCHAR(500)">
+            <column name="stored_file_name" type="VARCHAR(500)">
                 <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_hash" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
     </changeSet>

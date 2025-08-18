@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.symbol.SymbolMatrix
-import java.time.LocalDateTime
+import java.time.Instant
 
 class GameConfigTest {
 
@@ -37,8 +37,8 @@ class GameConfigTest {
     fun `test GameConfig creation with custom values`() {
         val symbolMatrix = SymbolMatrix(id = 1L, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
         val images = setOf(Image(id = 1L, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
-        val createdAt = LocalDateTime.now()
-        
+        val createdAt = Instant.now()
+
         val gameConfig = GameConfig(
             id = 1L,
             symbols = symbolMatrix,
@@ -70,8 +70,8 @@ class GameConfigTest {
     fun `test GameConfig data class equality`() {
         val symbolMatrix = SymbolMatrix(id = 1L, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
         val images = setOf(Image(id = 1L, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
-        val createdAt = LocalDateTime.now()
-        
+        val createdAt = Instant.now()
+
         val gameConfig1 = GameConfig(
             id = 1L,
             symbols = symbolMatrix,
