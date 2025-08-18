@@ -1,0 +1,7 @@
+package pl.umcs.picto3.symbol
+
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface SymbolMatrixRepository : JpaRepository<SymbolMatrix, Long> {
+    fun findByRowSizeAndColumnSize(rowSize: Short, columnSize: Short): List<SymbolMatrix>
+}
