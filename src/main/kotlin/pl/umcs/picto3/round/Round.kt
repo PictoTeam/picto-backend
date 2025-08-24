@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.Symbol
+import pl.umcs.picto3.game.Game
 import java.time.LocalDateTime
 
 @Entity
@@ -13,6 +14,10 @@ data class Round(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
+
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    val game: Game,
 
     @ManyToOne
     val listener: Player,
@@ -29,7 +34,6 @@ data class Round(
     val selectedImage: Image?,
 
     @OneToMany
-    @JoinColumn(name = "symbol_id")
     val selectedSymbols: List<Symbol> = emptyList(),
 
     @Column(name = "speaker_response_time_ms")

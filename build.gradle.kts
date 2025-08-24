@@ -47,6 +47,10 @@ dependencies {
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+	testImplementation("org.mockito:mockito-core:5.10.0")
+	testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+	testImplementation("com.h2database:h2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

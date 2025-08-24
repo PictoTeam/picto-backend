@@ -1,6 +1,5 @@
 package pl.umcs.picto3.image
 
-
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -8,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile
 import pl.umcs.picto3.common.StorageService
 import reactor.core.publisher.Mono
 
-
+// TODO: restrict access to admin users only
 @RestController
 @RequestMapping("/images")
 class ImageController(
@@ -20,7 +19,7 @@ class ImageController(
         @RequestParam("file") files: List<MultipartFile>,
         @RequestParam("names") names: List<String>,
     ): ResponseEntity<String> {
-        storageService.uploadBatch(files, names)
+        storageService.uploadBatchImages(files, names)
         return ResponseEntity.ok("Files uploaded successfully")
     }
 

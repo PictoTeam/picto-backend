@@ -30,6 +30,25 @@ class SymbolMapper(
         )
     }
 
+    fun toSymbolPlacementConfigDto(symbolPlacement: SymbolPlacement): SymbolPlacementConfigDto {
+        return SymbolPlacementConfigDto(
+            rowIndex = symbolPlacement.rowIndex,
+            columnIndex = symbolPlacement.columnIndex,
+            symbolId = symbolPlacement.symbol.id!!
+        )
+    }
+
+    fun toSymbolMatrixConfigDto(symbolMatrix: SymbolMatrix): SymbolMatrixConfigDto {
+        val mappedSymbolPlacements = symbolMatrix.symbolPlacements
+            .map { placement -> toSymbolPlacementConfigDto(placement) }.toSet()
+
+        return SymbolMatrixConfigDto(
+            rowSize = symbolMatrix.rowSize,
+            columnSize = symbolMatrix.columnSize,
+            symbolPlacements = mappedSymbolPlacements
+        )
+    }
+
     fun toSymbolPlacement(dto: SymbolPlacementConfigDto): SymbolPlacement {
         val symbol = symbolRepository.getReferenceById(dto.symbolId)
 
