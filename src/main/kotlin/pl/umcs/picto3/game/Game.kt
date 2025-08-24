@@ -5,13 +5,14 @@ import org.hibernate.annotations.CreationTimestamp
 import pl.umcs.picto3.gameconfig.GameConfig
 import pl.umcs.picto3.round.Round
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @Table(name = "games")
 data class Game(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID?,
 
     @ManyToOne
     val gameConfig: GameConfig,
@@ -27,5 +28,5 @@ data class Game(
     val startedAt: LocalDateTime?,
 
     @Column(name = "ended_at")
-    val endedAt: LocalDateTime?,
+    val endedAt: LocalDateTime?
 )

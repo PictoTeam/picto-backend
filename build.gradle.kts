@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
 	kotlin("jvm") version "2.2.0-RC2"
 	kotlin("plugin.spring") version "2.2.0-RC2"
@@ -29,8 +31,9 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-webflux")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+	implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 	implementation("org.liquibase:liquibase-core")
 	implementation("org.postgresql:postgresql")
 	implementation("org.hibernate.orm:hibernate-core")
@@ -63,4 +66,12 @@ tasks.withType<Test> {
 
 tasks.dokkaHtml.configure {
 	outputDirectory.set(layout.buildDirectory.dir("dokka"))
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+	freeCompilerArgs.set(
+		listOf(
+			"-Xannotation-default-target=param-property"
+		)
+	)
 }
