@@ -2,18 +2,19 @@ package pl.umcs.picto3.round
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import pl.umcs.picto3.game.Game
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.Symbol
-import pl.umcs.picto3.game.Game
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @Table(name = "rounds")
 data class Round(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID? = null,
 
     @ManyToOne
     @JoinColumn(name = "game_id")

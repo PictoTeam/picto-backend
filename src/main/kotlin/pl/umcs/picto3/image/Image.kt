@@ -1,13 +1,14 @@
 package pl.umcs.picto3.image
 
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 @Table(name = "images")
 data class Image(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID? = null,
 
     @Column
     val storedFileName: String,
