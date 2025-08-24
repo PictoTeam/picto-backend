@@ -90,9 +90,6 @@ class GameWebSocketHandler(
                     "newPlayerJoined" to "New player just joined session",
                 )
             )
-        }
-        //direct info to player
-        CoroutineScope(Dispatchers.IO).launch {
             sendToSession(
                 wsSession,
                 GameMessage.ADMIN_CONNECTED.type,
