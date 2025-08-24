@@ -5,13 +5,14 @@ import org.hibernate.annotations.CreationTimestamp
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.symbol.SymbolMatrix
 import java.time.Instant
+import java.util.*
 
 @Entity
 @Table(name = "game_configs")
 data class GameConfig(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID? = null,
 
     @ManyToOne
     val symbols: SymbolMatrix,

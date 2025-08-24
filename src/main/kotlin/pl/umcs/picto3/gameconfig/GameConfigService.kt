@@ -1,16 +1,18 @@
 package pl.umcs.picto3.gameconfig
 
 import org.springframework.stereotype.Service
+import pl.umcs.picto3.session.SessionService
 
 @Service
 class GameConfigService(
     private val gameConfigMapper: GameConfigMapper,
-    private val gameConfigRepository: GameConfigRepository
+    private val gameConfigRepository: GameConfigRepository,
+    private val sessionService: SessionService
 ) {
     fun createGame(gameConfigDto: GameConfigDto): GameConfigDto {
         val gameConfig = gameConfigMapper.toGameConfig(gameConfigDto)
         val savedGameConfig = gameConfigRepository.save(gameConfig)
-
+        sessionService.createSession(savedGameConfig)
         return gameConfigMapper.toDto(savedGameConfig)
     }
 
@@ -29,11 +31,10 @@ class GameConfigService(
         if (!gameConfigRepository.existsById(id)) {
             throw IllegalArgumentException("Game config with id $id not found")
         }
-        
+
         val existingGameConfig = gameConfigRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Game config with id $id not found") }
         val updatedGameConfig = GameConfig(
-            id = id,
             symbols = existingGameConfig.symbols,
             images = existingGameConfig.images,
             speakerImageCount = gameConfigDto.speakerImageCount,
@@ -45,7 +46,7 @@ class GameConfigService(
             resultScreenTime = gameConfigDto.resultScreenTime,
             createdAt = existingGameConfig.createdAt
         )
-        
+
         val savedGameConfig = gameConfigRepository.save(updatedGameConfig)
         return gameConfigMapper.toDto(savedGameConfig)
     }

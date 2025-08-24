@@ -47,9 +47,8 @@ class GameConfigMapper(
     private val symbolMapper: SymbolMapper,
     private val symbolService: SymbolService
 ) {
-    fun toGameConfig(dto: GameConfigDto, id: Long? = null): GameConfig {
+    fun toGameConfig(dto: GameConfigDto): GameConfig {
         return GameConfig(
-            id = id,
             symbols = symbolService.toSymbolMatrix(dto.symbols),
             images = imageRepository.findAllById(dto.imagesId).toSet(),
             speakerImageCount = dto.speakerImageCount,
