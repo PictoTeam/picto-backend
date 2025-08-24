@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.SymbolMapper
@@ -24,6 +25,9 @@ data class SessionConfigDto(
 
 @Component
 class SessionMapper(
+    @Value("{admin.game.api-key}:dev-admin-key")
+    private val adminGameApiKey: String,
+
     private val imageRepository: ImageRepository,
     private val symbolMapper: SymbolMapper
 ) {
@@ -39,7 +43,8 @@ class SessionMapper(
             wrongAnswerPoints = dto.wrongAnswerPoints,
             resultScreenTime = dto.resultScreenTime,
             accessCode = accessCode,
-            startingPlayers = mutableSetOf()
+            activeMembers = mutableSetOf(),
+            adminApiKey = adminGameApiKey,
         )
     }
 }
