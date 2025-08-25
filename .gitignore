@@ -4,8 +4,20 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+
+# Environment files
 .env
+.env.prod
+.env.local
+.env.*.local
 application-dev.yml
+
+# Production SSL certificates
+ssl/
+
+# Logs
+logs/
+*.log
 
 ### STS ###
 .apt_generated
