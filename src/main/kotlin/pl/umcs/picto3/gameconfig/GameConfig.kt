@@ -48,5 +48,5 @@ data class GameConfig(
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    val createdAt: Instant?,
+    val createdAt: Instant? = null,
 )

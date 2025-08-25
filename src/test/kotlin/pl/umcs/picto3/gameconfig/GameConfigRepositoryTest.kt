@@ -1,14 +1,16 @@
 package pl.umcs.picto3.gameconfig
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.test.context.ActiveProfiles
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.symbol.SymbolMatrix
 
 @DataJpaTest
+@ActiveProfiles("test")
 class GameConfigRepositoryTest {
 
     @Autowired
@@ -53,8 +55,7 @@ class GameConfigRepositoryTest {
             listenerAnswerTime = 15000,
             correctAnswerPoints = 2,
             wrongAnswerPoints = -2,
-            resultScreenTime = 5000,
-            createdAt = null
+            resultScreenTime = 5000
         )
         
         val savedGameConfig = gameConfigRepository.save(gameConfig)
@@ -115,8 +116,7 @@ class GameConfigRepositoryTest {
             listenerAnswerTime = 15000,
             correctAnswerPoints = 2,
             wrongAnswerPoints = -2,
-            resultScreenTime = 5000,
-            createdAt = null
+            resultScreenTime = 5000
         )
         
         val gameConfig2 = GameConfig(
@@ -129,8 +129,7 @@ class GameConfigRepositoryTest {
             listenerAnswerTime = 5000,
             correctAnswerPoints = 1,
             wrongAnswerPoints = -1,
-            resultScreenTime = 3000,
-            createdAt = null
+            resultScreenTime = 3000
         )
         
         gameConfigRepository.save(gameConfig1)
@@ -171,8 +170,7 @@ class GameConfigRepositoryTest {
             listenerAnswerTime = 15000,
             correctAnswerPoints = 2,
             wrongAnswerPoints = -2,
-            resultScreenTime = 5000,
-            createdAt = null
+            resultScreenTime = 5000
         )
         
         val savedGameConfig = gameConfigRepository.save(gameConfig)

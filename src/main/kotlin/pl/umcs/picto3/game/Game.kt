@@ -12,7 +12,7 @@ import java.util.*
 data class Game(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID?,
+    val id: UUID? = null,
 
     @ManyToOne
     val gameConfig: GameConfig,

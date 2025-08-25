@@ -3,6 +3,7 @@ package pl.umcs.picto3.gameconfig
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 // TODO: restrict access to admin users only
 @RestController
@@ -21,20 +22,20 @@ class GameConfigController(
     }
 
     @GetMapping("/{id}")
-    fun getGameConfig(@PathVariable id: Long): ResponseEntity<GameConfigDto> {
+    fun getGameConfig(@PathVariable id: UUID): ResponseEntity<GameConfigDto> {
         return ResponseEntity.ok(gameConfigService.getGameConfig(id))
     }
 
     @PostMapping("/{id}")
     fun updateGameConfig(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody gameConfig: GameConfigDto
     ): ResponseEntity<GameConfigDto> {
         return ResponseEntity.ok(gameConfigService.updateGameConfig(id, gameConfig))
     }
 
     @DeleteMapping("/{id}")
-    fun deleteGameConfig(@PathVariable id: Long): ResponseEntity<Void> {
+    fun deleteGameConfig(@PathVariable id: UUID): ResponseEntity<Void> {
         gameConfigService.deleteGameConfig(id)
         return ResponseEntity.noContent().build()
     }

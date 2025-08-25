@@ -13,6 +13,7 @@ import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrix
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
 import pl.umcs.picto3.symbol.SymbolService
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class GameConfigDtoTest {
@@ -28,6 +29,13 @@ class GameConfigDtoTest {
 
     @InjectMocks
     private lateinit var gameConfigMapper: GameConfigMapper
+    
+    companion object {
+        private val testGameConfigId = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        private val testSymbolMatrixId = UUID.fromString("22222222-2222-2222-2222-222222222222")
+        private val testImageId1 = UUID.fromString("44444444-4444-4444-4444-444444444444")
+        private val testImageId2 = UUID.fromString("55555555-5555-5555-5555-555555555555")
+    }
 
     @Test
     fun `test GameConfigDto creation and validation`() {
@@ -39,7 +47,7 @@ class GameConfigDtoTest {
         
         val gameConfigDto = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(1L, 2L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 6,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
@@ -50,7 +58,7 @@ class GameConfigDtoTest {
         )
         
         assertEquals(symbolMatrixConfigDto, gameConfigDto.symbols)
-        assertEquals(setOf(1L, 2L), gameConfigDto.imagesId)
+        assertEquals(setOf(testImageId1, testImageId2), gameConfigDto.imagesId)
         assertEquals(6.toShort(), gameConfigDto.speakerImageCount)
         assertEquals(8.toShort(), gameConfigDto.listenerImageCount)
         assertEquals(10000, gameConfigDto.speakerAnswerTime)
@@ -70,7 +78,7 @@ class GameConfigDtoTest {
         
         val gameConfigDto = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(1L, 2L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 6,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
@@ -81,15 +89,15 @@ class GameConfigDtoTest {
         )
         
         val symbolMatrix = SymbolMatrix(
-            id = 1L,
+            id = testSymbolMatrixId,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
             symbolPlacements = emptySet()
         )
         
         val images = setOf(
-            Image(id = 1L, storedFileName = "test1.jpg", fileName = "Test Image 1", fileHash = "hash123"),
-            Image(id = 2L, storedFileName = "test2.jpg", fileName = "Test Image 2", fileHash = "hash456")
+            Image(id = testImageId1, storedFileName = "test1.jpg", fileName = "Test Image 1", fileHash = "hash123"),
+            Image(id = testImageId2, storedFileName = "test2.jpg", fileName = "Test Image 2", fileHash = "hash456")
         )
         
         `when`(symbolService.toSymbolMatrix(symbolMatrixConfigDto)).thenReturn(symbolMatrix)
@@ -113,19 +121,19 @@ class GameConfigDtoTest {
     @Test
     fun `test toDto conversion`() {
         val symbolMatrix = SymbolMatrix(
-            id = 1L,
+            id = testSymbolMatrixId,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
             symbolPlacements = emptySet()
         )
         
         val images = setOf(
-            Image(id = 1L, storedFileName = "test1.jpg", fileName = "Test Image 1", fileHash = "hash123"),
-            Image(id = 2L, storedFileName = "test2.jpg", fileName = "Test Image 2", fileHash = "hash456")
+            Image(id = testImageId1, storedFileName = "test1.jpg", fileName = "Test Image 1", fileHash = "hash123"),
+            Image(id = testImageId2, storedFileName = "test2.jpg", fileName = "Test Image 2", fileHash = "hash456")
         )
         
         val gameConfig = GameConfig(
-            id = 1L,
+            id = testGameConfigId,
             symbols = symbolMatrix,
             images = images,
             speakerImageCount = 6,
@@ -149,7 +157,7 @@ class GameConfigDtoTest {
         val gameConfigDto = gameConfigMapper.toDto(gameConfig)
         
         assertEquals(symbolMatrixConfigDto, gameConfigDto.symbols)
-        assertEquals(setOf(1L, 2L), gameConfigDto.imagesId)
+        assertEquals(setOf(testImageId1, testImageId2), gameConfigDto.imagesId)
         assertEquals(gameConfig.speakerImageCount, gameConfigDto.speakerImageCount)
         assertEquals(gameConfig.listenerImageCount, gameConfigDto.listenerImageCount)
         assertEquals(gameConfig.speakerAnswerTime, gameConfigDto.speakerAnswerTime)

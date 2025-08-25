@@ -9,13 +9,14 @@ import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
 import pl.umcs.picto3.symbol.SymbolService
+import java.util.UUID
 
 data class GameConfigDto(
     @field:NotNull(message = "Symbols matrix is required")
     val symbols: SymbolMatrixConfigDto,
 
     @field:NotEmpty(message = "At least one image ID is required")
-    val imagesId: Set<Long>,
+    val imagesId: Set<UUID>,
 
     @field:Min(1)
     @field:Max(value = 100, message = "Speaker image count cannot exceed 100")

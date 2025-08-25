@@ -2,6 +2,7 @@ package pl.umcs.picto3.gameconfig
 
 import org.springframework.stereotype.Service
 import pl.umcs.picto3.session.SessionService
+import java.util.UUID
 
 @Service
 class GameConfigService(
@@ -20,14 +21,14 @@ class GameConfigService(
         return gameConfigRepository.findAll().map(gameConfigMapper::toDto)
     }
 
-    fun getGameConfig(id: Long): GameConfigDto {
+    fun getGameConfig(id: UUID): GameConfigDto {
         val gameConfig = gameConfigRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Game config with id $id not found") }
 
         return gameConfigMapper.toDto(gameConfig)
     }
 
-    fun updateGameConfig(id: Long, gameConfigDto: GameConfigDto): GameConfigDto {
+    fun updateGameConfig(id: UUID, gameConfigDto: GameConfigDto): GameConfigDto {
         if (!gameConfigRepository.existsById(id)) {
             throw IllegalArgumentException("Game config with id $id not found")
         }
@@ -52,7 +53,7 @@ class GameConfigService(
     }
 
     // TODO: set flag instead of deleting
-    fun deleteGameConfig(id: Long) {
+    fun deleteGameConfig(id: UUID) {
         if (!gameConfigRepository.existsById(id)) {
             throw IllegalArgumentException("Game config with id $id not found")
         }

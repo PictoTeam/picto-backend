@@ -1,6 +1,7 @@
 package pl.umcs.picto3.symbol
 
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 data class SymbolMatrixConfigDto(
     val rowSize: Short,
@@ -11,7 +12,7 @@ data class SymbolMatrixConfigDto(
 data class SymbolPlacementConfigDto(
     val rowIndex: Short,
     val columnIndex: Short,
-    val symbolId: Long
+    val symbolId: UUID
 )
 
 @Component

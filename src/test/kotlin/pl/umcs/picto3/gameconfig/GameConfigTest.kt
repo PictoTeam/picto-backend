@@ -1,18 +1,18 @@
 package pl.umcs.picto3.gameconfig
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.symbol.SymbolMatrix
 import java.time.Instant
 
 class GameConfigTest {
-
+    
     @Test
     fun `test GameConfig creation with default values`() {
-        val symbolMatrix = SymbolMatrix(id = 1L, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
-        val images = setOf(Image(id = 1L, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
-        
+        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
+        val images = setOf(Image(id = null, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
+
         val gameConfig = GameConfig(
             id = null,
             symbols = symbolMatrix,
@@ -35,12 +35,12 @@ class GameConfigTest {
     
     @Test
     fun `test GameConfig creation with custom values`() {
-        val symbolMatrix = SymbolMatrix(id = 1L, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
-        val images = setOf(Image(id = 1L, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
+        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
+        val images = setOf(Image(id = null, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
         val createdAt = Instant.now()
 
         val gameConfig = GameConfig(
-            id = 1L,
+            id = null,
             symbols = symbolMatrix,
             images = images,
             speakerImageCount = 6,
@@ -53,7 +53,7 @@ class GameConfigTest {
             createdAt = createdAt
         )
         
-        assertEquals(1L, gameConfig.id)
+        assertNull(gameConfig.id)
         assertEquals(symbolMatrix, gameConfig.symbols)
         assertEquals(images, gameConfig.images)
         assertEquals(6.toShort(), gameConfig.speakerImageCount)
@@ -68,12 +68,12 @@ class GameConfigTest {
     
     @Test
     fun `test GameConfig data class equality`() {
-        val symbolMatrix = SymbolMatrix(id = 1L, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
-        val images = setOf(Image(id = 1L, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
+        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
+        val images = setOf(Image(id = null, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
         val createdAt = Instant.now()
 
         val gameConfig1 = GameConfig(
-            id = 1L,
+            id = null,
             symbols = symbolMatrix,
             images = images,
             speakerImageCount = 6,
@@ -87,7 +87,7 @@ class GameConfigTest {
         )
         
         val gameConfig2 = GameConfig(
-            id = 1L,
+            id = null,
             symbols = symbolMatrix,
             images = images,
             speakerImageCount = 6,
@@ -101,10 +101,10 @@ class GameConfigTest {
         )
         
         val gameConfig3 = GameConfig(
-            id = 2L,
+            id = null,
             symbols = symbolMatrix,
             images = images,
-            speakerImageCount = 6,
+            speakerImageCount = 4,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
             listenerAnswerTime = 15000,

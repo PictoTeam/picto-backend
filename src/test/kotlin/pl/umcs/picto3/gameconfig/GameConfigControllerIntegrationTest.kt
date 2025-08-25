@@ -1,8 +1,8 @@
 package pl.umcs.picto3.gameconfig
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -10,18 +10,12 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.image.ImageRepository
-import pl.umcs.picto3.symbol.Symbol
-import pl.umcs.picto3.symbol.SymbolMapper
-import pl.umcs.picto3.symbol.SymbolMatrix
-import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
-import pl.umcs.picto3.symbol.SymbolMatrixRepository
-import pl.umcs.picto3.symbol.SymbolPlacementConfigDto
-import pl.umcs.picto3.symbol.SymbolPlacementRepository
-import pl.umcs.picto3.symbol.SymbolRepository
+import pl.umcs.picto3.symbol.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
