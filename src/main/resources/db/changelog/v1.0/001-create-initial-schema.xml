@@ -7,7 +7,7 @@
 
     <changeSet id="001-create-players-table" author="picto-dev">
         <createTable tableName="players">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="uuid" type="UUID">
@@ -17,7 +17,7 @@
     </changeSet>
     <changeSet id="002-create-images-table" author="picto-dev">
         <createTable tableName="images">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="stored_file_name" type="VARCHAR(500)">
@@ -33,7 +33,7 @@
     </changeSet>
     <changeSet id="003-create-symbols-table" author="picto-dev">
         <createTable tableName="symbols">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="stored_file_name" type="VARCHAR(500)">
@@ -49,7 +49,7 @@
     </changeSet>
     <changeSet id="004-create-symbol-matrices-table" author="picto-dev">
         <createTable tableName="symbol_matrices">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="row_size" type="SMALLINT" defaultValueNumeric="3">
@@ -62,7 +62,7 @@
     </changeSet>
     <changeSet id="005-create-symbol-placements-table" author="picto-dev">
         <createTable tableName="symbol_placements">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="row_index" type="SMALLINT">
@@ -71,17 +71,17 @@
             <column name="column_index" type="SMALLINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="symbol_id" type="BIGINT">
+            <column name="symbol_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="symbol_matrix_id" type="BIGINT">
+            <column name="symbol_matrix_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
     <changeSet id="006-create-games-table" author="picto-dev">
         <createTable tableName="games">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
@@ -89,27 +89,27 @@
             </column>
             <column name="started_at" type="TIMESTAMP"/>
             <column name="ended_at" type="TIMESTAMP"/>
-            <column name="game_config_id" type="BIGINT"/>
+            <column name="game_config_id" type="UUID"/>
         </createTable>
     </changeSet>
     <changeSet id="007-create-rounds-table" author="picto-dev">
         <createTable tableName="rounds">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="game_id" type="BIGINT">
+            <column name="game_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="listener_id" type="BIGINT">
+            <column name="listener_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="speaker_id" type="BIGINT">
+            <column name="speaker_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="topic_image_id" type="BIGINT">
+            <column name="topic_image_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="selected_image_id" type="BIGINT"/>
+            <column name="selected_image_id" type="UUID"/>
             <column name="speaker_response_time_ms" type="INTEGER"/>
             <column name="listener_response_time_ms" type="INTEGER"/>
             <column name="started_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
@@ -120,10 +120,10 @@
     </changeSet>
     <changeSet id="008-create-game-images-table" author="picto-dev">
         <createTable tableName="games_images">
-            <column name="game_id" type="BIGINT">
+            <column name="game_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="image_id" type="BIGINT">
+            <column name="image_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -131,10 +131,10 @@
     </changeSet>
     <changeSet id="009-create-round-symbols-table" author="picto-dev">
         <createTable tableName="rounds_symbols">
-            <column name="round_id" type="BIGINT">
+            <column name="round_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="symbol_id" type="BIGINT">
+            <column name="symbol_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -142,10 +142,10 @@
     </changeSet>
     <changeSet id="012-create-game-configs-table" author="picto-dev">
         <createTable tableName="game_configs">
-            <column name="id" type="BIGSERIAL">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="symbols_id" type="BIGINT">
+            <column name="symbols_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
             <column name="speaker_image_count" type="SMALLINT" defaultValueNumeric="4">
@@ -176,10 +176,10 @@
     </changeSet>
     <changeSet id="013-create-game-configs-images-table" author="picto-dev">
         <createTable tableName="game_configs_images">
-            <column name="game_config_id" type="BIGINT">
+            <column name="game_config_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="image_id" type="BIGINT">
+            <column name="image_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
         </createTable>
