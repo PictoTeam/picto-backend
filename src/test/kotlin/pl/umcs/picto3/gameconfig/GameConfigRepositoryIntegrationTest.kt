@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
+import jakarta.persistence.EntityManager
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.SymbolMatrix
@@ -14,11 +15,15 @@ import pl.umcs.picto3.symbol.SymbolPlacement
 import pl.umcs.picto3.symbol.SymbolPlacementRepository
 import pl.umcs.picto3.symbol.Symbol
 import pl.umcs.picto3.symbol.SymbolRepository
+import java.util.UUID
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 class GameConfigRepositoryIntegrationTest {
+
+    @Autowired
+    private lateinit var entityManager: EntityManager
 
     @Autowired
     private lateinit var gameConfigRepository: GameConfigRepository
@@ -87,11 +92,11 @@ class GameConfigRepositoryIntegrationTest {
             listenerAnswerTime = 15000,
             correctAnswerPoints = 2,
             wrongAnswerPoints = -2,
-            resultScreenTime = 5000,
-            createdAt = null
+            resultScreenTime = 5000
         )
 
         val savedGameConfig = gameConfigRepository.save(gameConfig)
+        entityManager.flush()
         val retrievedGameConfig = gameConfigRepository.findById(savedGameConfig.id!!).orElse(null)
 
         assertNotNull(retrievedGameConfig)
@@ -148,8 +153,7 @@ class GameConfigRepositoryIntegrationTest {
             listenerAnswerTime = 5000,
             correctAnswerPoints = 1,
             wrongAnswerPoints = -1,
-            resultScreenTime = 3000,
-            createdAt = null
+            resultScreenTime = 3000
         )
         val savedGameConfig = gameConfigRepository.save(gameConfig)
 
@@ -205,14 +209,13 @@ class GameConfigRepositoryIntegrationTest {
             listenerAnswerTime = 5000,
             correctAnswerPoints = 1,
             wrongAnswerPoints = -1,
-            resultScreenTime = 3000,
-            createdAt = null
+            resultScreenTime = 3000
         )
         val savedGameConfig = gameConfigRepository.save(gameConfig)
 
         gameConfigRepository.deleteById(savedGameConfig.id!!)
 
-        val deletedGameConfig = gameConfigRepository.findById(savedGameConfig.id!!).orElse(null)
+        val deletedGameConfig = gameConfigRepository.findById(savedGameConfig.id).orElse(null)
         assertNull(deletedGameConfig)
 
         assertTrue(symbolMatrixRepository.existsById(savedSymbolMatrix.id!!))
