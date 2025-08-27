@@ -1,13 +1,14 @@
 package pl.umcs.picto3.symbol
 
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 @Table(name = "symbols")
 data class Symbol(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID? = null,
 
     @Column
     val storedFileName: String,

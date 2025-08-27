@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
+import java.util.UUID
 
 @WebMvcTest(GameConfigController::class)
 class GameConfigControllerTest {
@@ -27,6 +28,12 @@ class GameConfigControllerTest {
 
     @MockitoBean
     private lateinit var gameConfigService: GameConfigService
+    
+    companion object {
+        private val testGameConfigId = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        private val testImageId1 = UUID.fromString("44444444-4444-4444-4444-444444444444")
+        private val testImageId2 = UUID.fromString("55555555-5555-5555-5555-555555555555")
+    }
 
     @Test
     fun `test create game config`() {
@@ -38,7 +45,7 @@ class GameConfigControllerTest {
         
         val gameConfigDto = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(1L, 2L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 6,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
@@ -75,7 +82,7 @@ class GameConfigControllerTest {
         
         val gameConfigDto1 = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(1L, 2L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 6,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
@@ -87,7 +94,7 @@ class GameConfigControllerTest {
         
         val gameConfigDto2 = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(3L, 4L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 4,
             listenerImageCount = 4,
             speakerAnswerTime = 5000,
@@ -119,7 +126,7 @@ class GameConfigControllerTest {
         
         val gameConfigDto = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(1L, 2L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 6,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
@@ -129,9 +136,9 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameConfigService.getGameConfig(1L)).thenReturn(gameConfigDto)
+        `when`(gameConfigService.getGameConfig(testGameConfigId)).thenReturn(gameConfigDto)
         
-        mockMvc.perform(get("/game-configs/1"))
+        mockMvc.perform(get("/game-configs/$testGameConfigId"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.speakerImageCount").value(6))
             .andExpect(jsonPath("$.listenerImageCount").value(8))
@@ -141,7 +148,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameConfigService).getGameConfig(1L)
+        verify(gameConfigService).getGameConfig(testGameConfigId)
     }
     
     @Test
@@ -154,7 +161,7 @@ class GameConfigControllerTest {
         
         val gameConfigDto = GameConfigDto(
             symbols = symbolMatrixConfigDto,
-            imagesId = setOf(1L, 2L),
+            imagesId = setOf(testImageId1, testImageId2),
             speakerImageCount = 6,
             listenerImageCount = 8,
             speakerAnswerTime = 10000,
@@ -164,9 +171,9 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameConfigService.updateGameConfig(eq(1L), any())).thenReturn(gameConfigDto)
+        `when`(gameConfigService.updateGameConfig(eq(testGameConfigId), any())).thenReturn(gameConfigDto)
         
-        mockMvc.perform(post("/game-configs/1")
+        mockMvc.perform(post("/game-configs/$testGameConfigId")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(gameConfigDto)))
             .andExpect(status().isOk)
@@ -178,14 +185,14 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameConfigService).updateGameConfig(eq(1L), any())
+        verify(gameConfigService).updateGameConfig(eq(testGameConfigId), any())
     }
     
     @Test
     fun `test delete game config`() {
-        mockMvc.perform(delete("/game-configs/1"))
+        mockMvc.perform(delete("/game-configs/$testGameConfigId"))
             .andExpect(status().isNoContent)
         
-        verify(gameConfigService).deleteGameConfig(1L)
+        verify(gameConfigService).deleteGameConfig(testGameConfigId)
     }
 }
