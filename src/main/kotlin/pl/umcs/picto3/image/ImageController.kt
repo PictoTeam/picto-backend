@@ -4,8 +4,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import pl.umcs.picto3.common.StorageService
-import reactor.core.publisher.Mono
+import pl.umcs.picto3.storage.StorageService
 
 // TODO: restrict access to admin users only
 @RestController
@@ -23,9 +22,8 @@ class ImageController(
         return ResponseEntity.ok("Files uploaded successfully")
     }
 
-    @GetMapping // keep this endpoint to test webflux with rest
-    fun test(): Mono<ResponseEntity<String>> {
-        return Mono.just(ResponseEntity.ok("Files uploaded successfully"))
+    @GetMapping("/{sessionAccessCode}")
+    fun getImagesRoundSet(@PathVariable sessionAccessCode: String): ResponseEntity<List<ImageDto>> {
+        return ResponseEntity.ok(storageService.getImagesForRoundWithSessionAccessCode(sessionAccessCode))
     }
-
 }

@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GameWebSocketHandler(
+    private val gameRepository: GameRepository,
     private val sessionService: SessionService,
     private val objectMapper: ObjectMapper
 ) : TextWebSocketHandler() {
@@ -81,7 +82,6 @@ class GameWebSocketHandler(
         sessionService.addPlayerToSession(newPlayer, accessCode)
         gameWsSession.get(gameSession.accessCode)?.put(newPlayer.uuid, wsSession)
 
-        //info to other game members
         CoroutineScope(Dispatchers.IO).launch {
             sendToMultipleSessions(
                 gameWsSession[gameSession.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
@@ -153,13 +153,12 @@ class GameWebSocketHandler(
 
     private suspend fun handleStartGame(session: WebSocketSession) {
         logger.info { "🚀 Trying to start game session " }
-
-        val gameSession = sessionService.findSessionAccessCodeByAdminWsSession(session.id)
-
-        logger.info { "✅ Game $gameSession has started" }
+        val gameSessionAccessCode = sessionService.findSessionAccessCodeByAdminWsSession(session.id)
+        gameRepository.getGameBySessionAccessCode(gameSessionAccessCode)
+        logger.info { "✅ Game $gameSessionAccessCode has started" }
         CoroutineScope(Dispatchers.IO).launch {
             sendToMultipleSessions(
-                gameWsSession[gameSession]?.values?.toMutableSet() ?: mutableSetOf(),
+                gameWsSession[gameSessionAccessCode]?.values?.toMutableSet() ?: mutableSetOf(),
                 GameMessage.GAME_STARTED.type,
                 mapOf(
                     "gameStart" to "Game has started",
