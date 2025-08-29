@@ -41,7 +41,7 @@ class StorageService(
             gameService.getRandomImages(sessionAccessCode).toList().map { image -> imageMapper.toNotMainDto(image) }
         val randomIndex = (0 until imagesForRound.size).random()
         return imagesForRound.mapIndexed { index, dto ->
-            if (index == randomIndex) dto else dto
+            if (index == randomIndex) dto.copy(isTopic = true) else dto.copy(isTopic = false)
         }
     }
 
