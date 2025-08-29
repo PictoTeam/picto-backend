@@ -1,19 +1,16 @@
 package pl.umcs.picto3.gameconfig
 
 import org.springframework.stereotype.Service
-import pl.umcs.picto3.session.SessionService
-import java.util.UUID
+import java.util.*
 
 @Service
 class GameConfigService(
     private val gameConfigMapper: GameConfigMapper,
-    private val gameConfigRepository: GameConfigRepository,
-    private val sessionService: SessionService
+    private val gameConfigRepository: GameConfigRepository
 ) {
-    fun createGame(gameConfigDto: GameConfigDto): GameConfigDto {
+    fun createGameConfig(gameConfigDto: GameConfigDto): GameConfigDto {
         val gameConfig = gameConfigMapper.toGameConfig(gameConfigDto)
         val savedGameConfig = gameConfigRepository.save(gameConfig)
-        sessionService.createSession(savedGameConfig)
         return gameConfigMapper.toDto(savedGameConfig)
     }
 

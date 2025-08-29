@@ -15,7 +15,7 @@ data class GameConfig(
     val id: UUID? = null,
 
     @ManyToOne
-    val symbols: SymbolMatrix,
+    val symbols: SymbolMatrix, //we can think about changing this to jdbc type since postgres 18 good support for it
 
     @ManyToMany
     @JoinTable(

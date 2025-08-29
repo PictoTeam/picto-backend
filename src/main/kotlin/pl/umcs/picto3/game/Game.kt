@@ -18,15 +18,18 @@ data class Game(
     val gameConfig: GameConfig,
 
     @OneToMany
-    val rounds: List<Round>,
+    val rounds: MutableList<Round> = mutableListOf(),
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime? = null,
 
     @Column(name = "started_at")
-    val startedAt: LocalDateTime?,
+    val startedAt: LocalDateTime? = null,
 
     @Column(name = "ended_at")
-    val endedAt: LocalDateTime?
+    val endedAt: LocalDateTime? = null,
+
+    @Column(name = "session_access_code")
+    val sessionAccessCode: String
 )

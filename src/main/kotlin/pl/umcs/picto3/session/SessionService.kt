@@ -3,21 +3,30 @@ package pl.umcs.picto3.session
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
-import pl.umcs.picto3.gameconfig.GameConfig
+import pl.umcs.picto3.game.Game
+import pl.umcs.picto3.game.GameRepository
+import pl.umcs.picto3.gameconfig.GameConfigRepository
 import pl.umcs.picto3.player.Player
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class SessionService(
     @Value("{admin.game.api-key}:dev-admin-key")
-    private val adminGameApiKey: String,
-    private val applicationEventPublisher: ApplicationEventPublisher
+    private var adminGameApiKey: String,
+    private val applicationEventPublisher: ApplicationEventPublisher,
+    private val gameConfigRepository: GameConfigRepository,
+    private val gameRepository: GameRepository
 ) {
     private val activeSessions = ConcurrentHashMap<String, Session>()
 
-    fun createSession(gameConfig: GameConfig): String {
+    fun createSession(gameConfigId: UUID): String {
+        val gameConfig =
+            gameConfigRepository.getReferenceById(gameConfigId) //lepiej zeby sie ktos nie pomyli tu z UUID bo nie wyskoczy blad xd
         val newCreatedSessionAccessCode = generateUniqueJoinCode()
         val newSession = Session(gameConfig, newCreatedSessionAccessCode, adminApiKey = adminGameApiKey)
+        val newGame = Game(gameConfig = gameConfig, sessionAccessCode = newCreatedSessionAccessCode)
+        gameRepository.save(newGame)
         activeSessions[newCreatedSessionAccessCode] = newSession
         applicationEventPublisher.publishEvent(SessionCreatedEvent(newCreatedSessionAccessCode))
         return newCreatedSessionAccessCode
@@ -37,9 +46,9 @@ class SessionService(
         session.activeMembers.add(newPlayer)
     }
 
-    fun findSessionAccessCodeByAdminWsSession(sessionId: String): String {
+    fun findSessionAccessCodeByAdminWsSession(sessionAccessCode: String): String {
         return activeSessions.values.find { session ->
-            session.adminsWsSessions.contains(sessionId)
+            session.adminsWsSessions.contains(sessionAccessCode)
         }?.accessCode ?: throw TODO("lepsza obsluga bledu tutaj raczej rzadzko bedzie wiec luz")
     }
 

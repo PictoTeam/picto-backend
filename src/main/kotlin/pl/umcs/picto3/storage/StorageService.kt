@@ -1,62 +1,27 @@
-package pl.umcs.picto3.common
+package pl.umcs.picto3.storage
 
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import pl.umcs.picto3.game.GameService
 import pl.umcs.picto3.image.Image
+import pl.umcs.picto3.image.ImageDto
+import pl.umcs.picto3.image.ImageMapper
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.Symbol
+import pl.umcs.picto3.symbol.SymbolMapper
+import pl.umcs.picto3.symbol.SymbolMatrixDto
 import pl.umcs.picto3.symbol.SymbolRepository
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.security.MessageDigest
-import java.util.*
-
-@Component
-class Storage {
-    private val storagePath: Path = Paths.get("src/main/resources/static")
-
-    private val allowedExtensions = setOf("jpg", "jpeg", "png")
-
-    fun store(file: MultipartFile, folder: String = ""): String {
-        try {
-            if (file.isEmpty) {
-                throw StorageException("Failed to store empty file.")
-            }
-
-            val originalFilename = file.originalFilename
-                ?: throw StorageException("No filename provided")
-
-            val extension = originalFilename.substringAfterLast('.', "").lowercase()
-            if (extension !in allowedExtensions) {
-                throw StorageException("File extension '$extension' not allowed")
-            }
-
-            val uuidFilename = "${UUID.randomUUID()}.$extension"
-            val targetPath = if (folder.isNotEmpty()) storagePath.resolve(folder) else storagePath
-            Files.createDirectories(targetPath)
-
-            val destinationFile = targetPath.resolve(uuidFilename)
-
-            file.inputStream.use { inputStream ->
-                Files.copy(inputStream, destinationFile)
-            }
-            return if (folder.isNotEmpty()) "$folder/$uuidFilename" else uuidFilename
-
-        } catch (e: IOException) {
-            throw StorageException("Failed to store file: ${e.message}", e)
-        }
-    }
-}
 
 @Service
 class StorageService(
     private val imageRepository: ImageRepository,
     private val symbolRepository: SymbolRepository,
-    private val storage: Storage
+    private val gameService: GameService,
+    private val storage: Storage,
+    private val imageMapper: ImageMapper,
+    private val symbolMapper: SymbolMapper
 ) {
 
     @Transactional
@@ -69,6 +34,20 @@ class StorageService(
             val name = names[i]
             saveImage(file, name)
         }
+    }
+
+    fun getImagesForRoundWithSessionAccessCode(sessionAccessCode: String): List<ImageDto> {
+        val imagesForRound =
+            gameService.getRandomImages(sessionAccessCode).toList().map { image -> imageMapper.toNotMainDto(image) }
+        val randomIndex = (0 until imagesForRound.size).random()
+        return imagesForRound.mapIndexed { index, dto ->
+            if (index == randomIndex) dto.copy(isTopic = true) else dto.copy(isTopic = false)
+        }
+    }
+
+    fun getSymbolsForGameWithSessionAccessCode(sessionAccessCode: String): SymbolMatrixDto {
+        val symbolsForGame = gameService.getSymbolsForGame(sessionAccessCode)
+        return symbolMapper.toSymbolMatrixDto(symbolsForGame)
     }
 
     fun saveImage(file: MultipartFile, fileName: String): Image {
@@ -119,8 +98,4 @@ class StorageService(
         return symbolRepository.save(symbol)
     }
 
-}
-
-class StorageException(message: String, cause: Throwable? = null) : RuntimeException(message, cause) {
-    //TODO improve handling this Exception
 }
