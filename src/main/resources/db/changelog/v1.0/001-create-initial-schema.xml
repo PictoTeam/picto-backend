@@ -7,11 +7,8 @@
 
     <changeSet id="001-create-players-table" author="picto-dev">
         <createTable tableName="players">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="uuid" type="UUID">
-                <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
     </changeSet>
@@ -90,6 +87,9 @@
             <column name="started_at" type="TIMESTAMP"/>
             <column name="ended_at" type="TIMESTAMP"/>
             <column name="game_config_id" type="UUID"/>
+            <column name="session_access_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet id="007-create-rounds-table" author="picto-dev">
@@ -140,7 +140,7 @@
         </createTable>
         <addPrimaryKey tableName="rounds_symbols" columnNames="round_id,symbol_id"/>
     </changeSet>
-    <changeSet id="012-create-game-configs-table" author="picto-dev">
+    <changeSet id="010-create-game-configs-table" author="picto-dev">
         <createTable tableName="game_configs">
             <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
@@ -174,7 +174,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="013-create-game-configs-images-table" author="picto-dev">
+    <changeSet id="011-create-game-configs-images-table" author="picto-dev">
         <createTable tableName="game_configs_images">
             <column name="game_config_id" type="UUID">
                 <constraints nullable="false"/>
@@ -185,10 +185,7 @@
         </createTable>
         <addPrimaryKey tableName="game_configs_images" columnNames="game_config_id,image_id"/>
     </changeSet>
-    <changeSet id="011-create-indexes" author="picto-dev">
-        <createIndex tableName="players" indexName="idx_players_uuid">
-            <column name="uuid"/>
-        </createIndex>
+    <changeSet id="012-create-indexes" author="picto-dev">
         <createIndex tableName="rounds" indexName="idx_rounds_game_id">
             <column name="game_id"/>
         </createIndex>
@@ -202,7 +199,7 @@
             <column name="symbol_matrix_id"/>
         </createIndex>
     </changeSet>
-    <changeSet id="010-add-foreign-keys" author="picto-dev">
+    <changeSet id="013-add-foreign-keys" author="picto-dev">
         <addForeignKeyConstraint baseTableName="symbol_placements" baseColumnNames="symbol_id" constraintName="fk_symbol_placements_symbol" referencedTableName="symbols" referencedColumnNames="id" onDelete="CASCADE"/>
         <addForeignKeyConstraint baseTableName="symbol_placements" baseColumnNames="symbol_matrix_id" constraintName="fk_symbol_placements_matrix" referencedTableName="symbol_matrices" referencedColumnNames="id" onDelete="CASCADE"/>
         <addForeignKeyConstraint baseTableName="games" baseColumnNames="game_config_id" constraintName="fk_games_game_config" referencedTableName="game_configs" referencedColumnNames="id" onDelete="RESTRICT"/>
