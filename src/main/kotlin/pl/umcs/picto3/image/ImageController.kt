@@ -22,6 +22,11 @@ class ImageController(
         return ResponseEntity.ok("Files uploaded successfully")
     }
 
+    @GetMapping
+    fun getAllImages(): ResponseEntity<List<ImageDto>> {
+        return ResponseEntity.ok(storageService.getAllImages())
+    }
+
     @GetMapping("/{sessionAccessCode}")
     fun getImagesRoundSet(@PathVariable sessionAccessCode: String): ResponseEntity<List<ImageDto>> {
         return ResponseEntity.ok(storageService.getImagesForRoundWithSessionAccessCode(sessionAccessCode))

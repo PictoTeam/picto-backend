@@ -36,6 +36,10 @@ class StorageService(
         }
     }
 
+    fun getAllImages(): List<ImageDto> {
+        return imageRepository.findAll().map { image -> imageMapper.toNotMainDto(image) }
+    }
+
     fun getImagesForRoundWithSessionAccessCode(sessionAccessCode: String): List<ImageDto> {
         val imagesForRound =
             gameService.getRandomImages(sessionAccessCode).toList().map { image -> imageMapper.toNotMainDto(image) }
