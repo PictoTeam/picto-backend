@@ -13,6 +13,7 @@ class GameConfigMapper(
 ) {
     fun toGameConfig(dto: GameConfigDto): GameConfig {
         return GameConfig(
+            id = dto.id,
             symbols = symbolService.toSymbolMatrix(dto.symbols),
             images = imageRepository.findAllById(dto.imagesId).toSet(),
             speakerImageCount = dto.speakerImageCount,
@@ -28,6 +29,7 @@ class GameConfigMapper(
 
     fun toDto(gameConfig: GameConfig): GameConfigDto {
         return GameConfigDto(
+            id = gameConfig.id,
             symbols = symbolMapper.toSymbolMatrixConfigDto(gameConfig.symbols),
             imagesId = gameConfig.images.map { it.id!! }.toSet(),
             speakerImageCount = gameConfig.speakerImageCount,
