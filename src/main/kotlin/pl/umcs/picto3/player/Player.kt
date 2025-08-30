@@ -12,11 +12,8 @@ data class Player(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
-    @Column(name = "uuid")
-    val uuid: UUID = UUID.randomUUID(),
-
     @OneToMany
-    val rounds: List<Round> = emptyList(),
+    val rounds: MutableList<Round> = mutableListOf(),
 
     @Transient
     val sessionAccessCode: String

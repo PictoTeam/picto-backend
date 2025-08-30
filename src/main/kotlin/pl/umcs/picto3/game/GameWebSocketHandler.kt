@@ -78,9 +78,9 @@ class GameWebSocketHandler(
 
         val accessCode = gameSession.accessCode
         val newPlayer = Player(sessionAccessCode = gameSession.accessCode)
-        logger.debug { "Player '${newPlayer.uuid}' joined session with accessCode: $accessCode" }
+        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: $accessCode" }
         sessionService.addPlayerToSession(newPlayer, accessCode)
-        gameWsSession.get(gameSession.accessCode)?.put(newPlayer.uuid, wsSession)
+        gameWsSession.get(gameSession.accessCode)?.put(newPlayer.id!!, wsSession)
 
         CoroutineScope(Dispatchers.IO).launch {
             sendToMultipleSessions(

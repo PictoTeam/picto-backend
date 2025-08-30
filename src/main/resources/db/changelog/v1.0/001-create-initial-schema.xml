@@ -7,11 +7,8 @@
 
     <changeSet id="001-create-players-table" author="picto-dev">
         <createTable tableName="players">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="uuid" type="UUID">
-                <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
     </changeSet>
@@ -90,6 +87,9 @@
             <column name="started_at" type="TIMESTAMP"/>
             <column name="ended_at" type="TIMESTAMP"/>
             <column name="game_config_id" type="UUID"/>
+            <column name="session_access_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet id="007-create-rounds-table" author="picto-dev">
@@ -186,9 +186,6 @@
         <addPrimaryKey tableName="game_configs_images" columnNames="game_config_id,image_id"/>
     </changeSet>
     <changeSet id="011-create-indexes" author="picto-dev">
-        <createIndex tableName="players" indexName="idx_players_uuid">
-            <column name="uuid"/>
-        </createIndex>
         <createIndex tableName="rounds" indexName="idx_rounds_game_id">
             <column name="game_id"/>
         </createIndex>
