@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 class SymbolMapper(
     private val symbolRepository: SymbolRepository
 ) {
-    private val serverPath = "src/main/resources/static/"
+    private val serverPath = "/static/symbols/"
 
     fun toSymbolMatrixDto(entity: SymbolMatrix): SymbolMatrixDto {
         return SymbolMatrixDto(
