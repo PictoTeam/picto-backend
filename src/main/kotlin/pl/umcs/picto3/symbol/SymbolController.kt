@@ -21,6 +21,11 @@ class SymbolController(
         return ResponseEntity.ok("Symbols uploaded successfully")
     }
 
+    @GetMapping
+    fun getAllSymbols(): ResponseEntity<List<SymbolDto>> {
+        return ResponseEntity.ok(storageService.getAllSymbols())
+    }
+
     @GetMapping("/{sessionAccessCode}")
     fun getSymbolsForGame(@PathVariable sessionAccessCode: String): ResponseEntity<SymbolMatrixDto> {
         return ResponseEntity.ok(storageService.getSymbolsForGameWithSessionAccessCode(sessionAccessCode))

@@ -66,4 +66,13 @@ class SymbolMapper(
             symbol = symbol
         )
     }
+
+    fun toDto(symbol: Symbol): SymbolDto {
+        val serverPath = "src/main/resources/static/"
+
+        return SymbolDto(
+            id = symbol.id!!,
+            symbolPath = serverPath + symbol.storedFileName
+        )
+    }
 }

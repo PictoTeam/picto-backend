@@ -9,6 +9,7 @@ import pl.umcs.picto3.image.ImageDto
 import pl.umcs.picto3.image.ImageMapper
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.Symbol
+import pl.umcs.picto3.symbol.SymbolDto
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrixDto
 import pl.umcs.picto3.symbol.SymbolRepository
@@ -100,6 +101,10 @@ class StorageService(
         val storedFileName = storage.store(file, "symbols")
         val symbol = Symbol(null, storedFileName, fileName, fileToSaveHash)
         return symbolRepository.save(symbol)
+    }
+
+    fun getAllSymbols(): List<SymbolDto> {
+        return symbolRepository.findAll().map { symbol -> symbolMapper.toDto(symbol) }
     }
 
 }
