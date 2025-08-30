@@ -239,7 +239,7 @@ class GameConfigControllerIntegrationTest {
             resultScreenTime = 5000
         )
 
-        mockMvc.perform(post("/game-configs/${savedGameConfig.id}")
+        mockMvc.perform(put("/game-configs/${savedGameConfig.id}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(gameConfigDto)))
             .andExpect(status().isOk)
