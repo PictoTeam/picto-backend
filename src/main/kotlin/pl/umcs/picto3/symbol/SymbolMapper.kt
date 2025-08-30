@@ -19,7 +19,7 @@ class SymbolMapper(
         return SymbolPlacementDto(
             entity.rowIndex,
             entity.columnIndex,
-            "/static/symbols/" + entity.symbol.fileName
+            "/static/" + entity.symbol.storedFileName
         )
     }
 
@@ -69,7 +69,7 @@ class SymbolMapper(
     fun toDto(symbol: Symbol): SymbolDto {
         return SymbolDto(
             id = symbol.id!!,
-            symbolPath = "/static/symbols/" + symbol.fileName,
+            symbolPath = "/static/" + symbol.storedFileName
         )
     }
 }
