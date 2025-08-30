@@ -63,7 +63,8 @@ class StorageService(
         if (imageRepository.findByStoredFileName(fileName) != null) {
             throw StorageException("file with given name: $fileName already exists")
         }
-        val storedFileName = storage.store(file)
+        val storedFilePath = storage.store(file, "images")
+        val storedFileName = storedFilePath.substringAfterLast("/").split(".")[0]
         val image = Image(null, storedFileName, fileName, fileToSaveHash)
         return imageRepository.save(image)
     }
@@ -98,7 +99,8 @@ class StorageService(
         if (symbolRepository.findByStoredFileName(fileName) != null) {
             throw StorageException("file with given name: $fileName already exists")
         }
-        val storedFileName = storage.store(file, "symbols")
+        val storedFilePath = storage.store(file, "symbols")
+        val storedFileName = storedFilePath.substringAfterLast("/").split(".")[0]
         val symbol = Symbol(null, storedFileName, fileName, fileToSaveHash)
         return symbolRepository.save(symbol)
     }
