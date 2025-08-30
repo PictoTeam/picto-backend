@@ -40,6 +40,15 @@ class SessionService(
         return activeSessions[accessCode] ?: throw IllegalArgumentException("Session with code $accessCode not found")
     }
 
+    fun startSession(accessCode: String): String {
+        if (sessionExists(accessCode)) {
+            applicationEventPublisher.publishEvent(GameStartedEvent(accessCode))
+            return "Game session $accessCode started successfully"
+        } else {
+            throw IllegalArgumentException("Session with code $accessCode not found")
+        }
+    }
+
     fun addPlayerToSession(newPlayer: Player, sessionAccessCode: String) {
         val session = activeSessions[sessionAccessCode]
             ?: throw IllegalArgumentException("Session with code $sessionAccessCode not found")

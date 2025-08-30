@@ -12,6 +12,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.session.Session
 import pl.umcs.picto3.session.SessionCreatedEvent
+import pl.umcs.picto3.session.GameStartedEvent
 import pl.umcs.picto3.session.SessionService
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -29,6 +30,21 @@ class GameWebSocketHandler(
     @EventListener
     fun handleSessionCreated(event: SessionCreatedEvent) {
         createNewSession(event.accessCode)
+    }
+
+    @EventListener
+    fun handleGameStarted(event: GameStartedEvent) {
+        logger.info { "🚀 Starting game session ${event.accessCode}" }
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToMultipleSessions(
+                gameWsSession[event.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
+                GameMessage.GAME_STARTED.type,
+                mapOf(
+                    "message" to "Game has started"
+                )
+            )
+        }
+        logger.info { "✅ Game ${event.accessCode} has started" }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
@@ -127,12 +143,6 @@ class GameWebSocketHandler(
             val type = messageData["type"] as? String ?: throw Exception("Missing message type")
 
             when (type) {
-                "START_GAME" -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        handleStartGame(wsSession)
-                    }
-                }
-
                 else -> {
                     logger.warn { "Unknown message type: $type" }
                 }
@@ -149,23 +159,6 @@ class GameWebSocketHandler(
                 )
             }
         }
-    }
-
-    private suspend fun handleStartGame(session: WebSocketSession) {
-        logger.info { "🚀 Trying to start game session " }
-        val gameSessionAccessCode = sessionService.findSessionAccessCodeByAdminWsSession(session.id)
-        gameRepository.getGameBySessionAccessCode(gameSessionAccessCode)
-        logger.info { "✅ Game $gameSessionAccessCode has started" }
-        CoroutineScope(Dispatchers.IO).launch {
-            sendToMultipleSessions(
-                gameWsSession[gameSessionAccessCode]?.values?.toMutableSet() ?: mutableSetOf(),
-                GameMessage.GAME_STARTED.type,
-                mapOf(
-                    "gameStart" to "Game has started",
-                )
-            )
-        }
-
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
