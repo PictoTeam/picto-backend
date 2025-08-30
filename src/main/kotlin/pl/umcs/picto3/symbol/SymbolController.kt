@@ -14,11 +14,16 @@ class SymbolController(
 
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadBatchSymbols(
-        @RequestParam("file") files: List<MultipartFile>,
+        @RequestParam("files") files: List<MultipartFile>,
         @RequestParam("names") names: List<String>,
     ): ResponseEntity<String> {
         storageService.uploadBatchSymbols(files, names)
         return ResponseEntity.ok("Symbols uploaded successfully")
+    }
+
+    @GetMapping
+    fun getAllSymbols(): ResponseEntity<List<SymbolDto>> {
+        return ResponseEntity.ok(storageService.getAllSymbols())
     }
 
     @GetMapping("/{sessionAccessCode}")

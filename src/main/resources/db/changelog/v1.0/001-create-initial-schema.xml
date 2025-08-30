@@ -14,13 +14,13 @@
     </changeSet>
     <changeSet id="002-create-images-table" author="picto-dev">
         <createTable tableName="images">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="stored_file_name" type="VARCHAR(500)">
+            <column name="stored_file_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="file_name" type="VARCHAR(500)">
+            <column name="file_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="file_hash" type="VARCHAR(64)">
@@ -30,13 +30,13 @@
     </changeSet>
     <changeSet id="003-create-symbols-table" author="picto-dev">
         <createTable tableName="symbols">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="stored_file_name" type="VARCHAR(500)">
+            <column name="stored_file_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="file_name" type="VARCHAR(500)">
+            <column name="file_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="file_hash" type="VARCHAR(64)">
@@ -46,20 +46,20 @@
     </changeSet>
     <changeSet id="004-create-symbol-matrices-table" author="picto-dev">
         <createTable tableName="symbol_matrices">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="row_size" type="SMALLINT" defaultValueNumeric="3">
+            <column name="row_size" type="SMALLINT" defaultValue="3">
                 <constraints nullable="false"/>
             </column>
-            <column name="column_size" type="SMALLINT" defaultValueNumeric="3">
+            <column name="column_size" type="SMALLINT" defaultValue="3">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
     <changeSet id="005-create-symbol-placements-table" author="picto-dev">
         <createTable tableName="symbol_placements">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="row_index" type="SMALLINT">
@@ -71,30 +71,62 @@
             <column name="symbol_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="symbol_matrix_id" type="UUID">
+        </createTable>
+    </changeSet>
+
+    <changeSet id="006-create-game-configs-table" author="picto-dev">
+        <createTable tableName="game_configs">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="symbols_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="speaker_image_count" type="SMALLINT" defaultValue="4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="listener_image_count" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="006-create-games-table" author="picto-dev">
+
+    <changeSet id="007-create-game-configs-images-table" author="picto-dev">
+        <createTable tableName="game_configs_images">
+            <column name="game_config_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="008-create-games-table" author="picto-dev">
         <createTable tableName="games">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+            <column name="game_config_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="session_access_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="started_at" type="TIMESTAMP"/>
             <column name="ended_at" type="TIMESTAMP"/>
-            <column name="game_config_id" type="UUID"/>
-            <column name="session_access_code" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
     </changeSet>
-    <changeSet id="007-create-rounds-table" author="picto-dev">
+
+    <changeSet id="009-create-rounds-table" author="picto-dev">
         <createTable tableName="rounds">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="game_id" type="UUID">
@@ -112,109 +144,108 @@
             <column name="selected_image_id" type="UUID"/>
             <column name="speaker_response_time_ms" type="INTEGER"/>
             <column name="listener_response_time_ms" type="INTEGER"/>
-            <column name="started_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+            <column name="started_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="ended_at" type="TIMESTAMP"/>
         </createTable>
     </changeSet>
-    <changeSet id="008-create-game-images-table" author="picto-dev">
-        <createTable tableName="games_images">
-            <column name="game_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-            <column name="image_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addPrimaryKey tableName="games_images" columnNames="game_id,image_id"/>
+
+    <changeSet id="010-create-foreign-keys" author="picto-dev">
+        <addForeignKeyConstraint
+                baseTableName="symbol_placements"
+                baseColumnNames="symbol_id"
+                constraintName="fk_symbol_placements_symbol"
+                referencedTableName="symbols"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="game_configs"
+                baseColumnNames="symbols_id"
+                constraintName="fk_game_configs_symbol_matrix"
+                referencedTableName="symbol_matrices"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="game_configs_images"
+                baseColumnNames="game_config_id"
+                constraintName="fk_game_configs_images_config"
+                referencedTableName="game_configs"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="game_configs_images"
+                baseColumnNames="image_id"
+                constraintName="fk_game_configs_images_image"
+                referencedTableName="images"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="games"
+                baseColumnNames="game_config_id"
+                constraintName="fk_games_game_config"
+                referencedTableName="game_configs"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="rounds"
+                baseColumnNames="game_id"
+                constraintName="fk_rounds_game"
+                referencedTableName="games"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="rounds"
+                baseColumnNames="listener_id"
+                constraintName="fk_rounds_listener"
+                referencedTableName="players"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="rounds"
+                baseColumnNames="speaker_id"
+                constraintName="fk_rounds_speaker"
+                referencedTableName="players"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="rounds"
+                baseColumnNames="topic_image_id"
+                constraintName="fk_rounds_topic_image"
+                referencedTableName="images"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="rounds"
+                baseColumnNames="selected_image_id"
+                constraintName="fk_rounds_selected_image"
+                referencedTableName="images"
+                referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="009-create-round-symbols-table" author="picto-dev">
-        <createTable tableName="rounds_symbols">
-            <column name="round_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-            <column name="symbol_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addPrimaryKey tableName="rounds_symbols" columnNames="round_id,symbol_id"/>
+
+    <changeSet id="011-create-join-table-constraints" author="picto-dev">
+        <addPrimaryKey
+                tableName="game_configs_images"
+                columnNames="game_config_id,image_id"
+                constraintName="pk_game_configs_images"/>
     </changeSet>
-    <changeSet id="010-create-game-configs-table" author="picto-dev">
-        <createTable tableName="game_configs">
-            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="symbols_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-            <column name="speaker_image_count" type="SMALLINT" defaultValueNumeric="4">
-                <constraints nullable="false"/>
-            </column>
-            <column name="listener_image_count" type="SMALLINT" defaultValueNumeric="4">
-                <constraints nullable="false"/>
-            </column>
-            <column name="speaker_answer_time_ms" type="INTEGER" defaultValueNumeric="-1">
-                <constraints nullable="false"/>
-            </column>
-            <column name="listener_answer_time_ms" type="INTEGER" defaultValueNumeric="-1">
-                <constraints nullable="false"/>
-            </column>
-            <column name="correct_answer_points" type="SMALLINT" defaultValueNumeric="1">
-                <constraints nullable="false"/>
-            </column>
-            <column name="wrong_answer_points" type="SMALLINT" defaultValueNumeric="-1">
-                <constraints nullable="false"/>
-            </column>
-            <column name="result_screen_time_ms" type="INTEGER" defaultValueNumeric="3000">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet id="011-create-game-configs-images-table" author="picto-dev">
-        <createTable tableName="game_configs_images">
-            <column name="game_config_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-            <column name="image_id" type="UUID">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addPrimaryKey tableName="game_configs_images" columnNames="game_config_id,image_id"/>
-    </changeSet>
+
     <changeSet id="012-create-indexes" author="picto-dev">
         <createIndex tableName="rounds" indexName="idx_rounds_game_id">
             <column name="game_id"/>
         </createIndex>
-        <createIndex tableName="rounds" indexName="idx_rounds_started_at">
-            <column name="started_at"/>
+
+        <createIndex tableName="games" indexName="idx_games_session_access_code">
+            <column name="session_access_code"/>
         </createIndex>
-        <createIndex tableName="games" indexName="idx_games_created_at">
-            <column name="created_at"/>
+
+        <createIndex tableName="images" indexName="idx_images_file_hash">
+            <column name="file_hash"/>
         </createIndex>
-        <createIndex tableName="symbol_placements" indexName="idx_symbol_placements_matrix">
-            <column name="symbol_matrix_id"/>
+
+        <createIndex tableName="symbols" indexName="idx_symbols_file_hash">
+            <column name="file_hash"/>
         </createIndex>
-    </changeSet>
-    <changeSet id="013-add-foreign-keys" author="picto-dev">
-        <addForeignKeyConstraint baseTableName="symbol_placements" baseColumnNames="symbol_id" constraintName="fk_symbol_placements_symbol" referencedTableName="symbols" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="symbol_placements" baseColumnNames="symbol_matrix_id" constraintName="fk_symbol_placements_matrix" referencedTableName="symbol_matrices" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="games" baseColumnNames="game_config_id" constraintName="fk_games_game_config" referencedTableName="game_configs" referencedColumnNames="id" onDelete="RESTRICT"/>
-        <addForeignKeyConstraint baseTableName="rounds" baseColumnNames="listener_id" constraintName="fk_rounds_listener" referencedTableName="players" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="rounds" baseColumnNames="speaker_id" constraintName="fk_rounds_speaker" referencedTableName="players" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="rounds" baseColumnNames="topic_image_id" constraintName="fk_rounds_topic_image" referencedTableName="images" referencedColumnNames="id" onDelete="RESTRICT"/>
-        <addForeignKeyConstraint baseTableName="rounds" baseColumnNames="selected_image_id" constraintName="fk_rounds_selected_image" referencedTableName="images" referencedColumnNames="id" onDelete="SET NULL"/>
-        <addForeignKeyConstraint baseTableName="rounds" baseColumnNames="game_id" constraintName="fk_rounds_game" referencedTableName="games" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="games_images" baseColumnNames="game_id" constraintName="fk_games_images_game" referencedTableName="games" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="games_images" baseColumnNames="image_id" constraintName="fk_games_images_image" referencedTableName="images" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="rounds_symbols" baseColumnNames="round_id" constraintName="fk_rounds_symbols_round" referencedTableName="rounds" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="rounds_symbols" baseColumnNames="symbol_id" constraintName="fk_rounds_symbols_symbol" referencedTableName="symbols" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="game_configs" baseColumnNames="symbols_id" constraintName="fk_game_configs_symbol_matrix" referencedTableName="symbol_matrices" referencedColumnNames="id" onDelete="RESTRICT"/>
-        <addForeignKeyConstraint baseTableName="game_configs_images" baseColumnNames="game_config_id" constraintName="fk_game_configs_images_config" referencedTableName="game_configs" referencedColumnNames="id" onDelete="CASCADE"/>
-        <addForeignKeyConstraint baseTableName="game_configs_images" baseColumnNames="image_id" constraintName="fk_game_configs_images_image" referencedTableName="images" referencedColumnNames="id" onDelete="CASCADE"/>
     </changeSet>
 
 </databaseChangeLog>

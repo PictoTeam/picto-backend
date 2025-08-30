@@ -17,4 +17,9 @@ class SessionController(
     fun createSession(@PathVariable gameConfigId: UUID): ResponseEntity<String> {
         return ResponseEntity.ok(sessionService.createSession(gameConfigId))
     }
+
+    @PostMapping("/{sessionAccessCode}/start")
+    fun startSession(@PathVariable sessionAccessCode: String): ResponseEntity<String> {
+        return ResponseEntity.ok(sessionService.startSession(sessionAccessCode))
+    }
 }

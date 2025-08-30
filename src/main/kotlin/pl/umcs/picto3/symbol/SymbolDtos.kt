@@ -25,3 +25,8 @@ data class SymbolMatrixDto(
     val columnSize: Short,
     val symbols: List<SymbolPlacementDto>
 )
+
+data class SymbolDto(
+    val id: UUID?,
+    val symbolPath: String
+)

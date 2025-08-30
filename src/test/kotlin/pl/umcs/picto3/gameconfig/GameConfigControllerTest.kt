@@ -55,8 +55,8 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameConfigService.createGame(any())).thenReturn(gameConfigDto)
-        
+        `when`(gameConfigService.createGameConfig(any<GameConfigDto>())).thenReturn(gameConfigDto)
+
         mockMvc.perform(post("/game-configs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(gameConfigDto)))
@@ -69,7 +69,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameConfigService).createGame(any())
+        verify(gameConfigService).createGameConfig(any<GameConfigDto>())
     }
     
     @Test
@@ -171,9 +171,9 @@ class GameConfigControllerTest {
             resultScreenTime = 5000
         )
         
-        `when`(gameConfigService.updateGameConfig(eq(testGameConfigId), any())).thenReturn(gameConfigDto)
-        
-        mockMvc.perform(post("/game-configs/$testGameConfigId")
+        `when`(gameConfigService.updateGameConfig(eq(testGameConfigId), any<GameConfigDto>())).thenReturn(gameConfigDto)
+
+        mockMvc.perform(put("/game-configs/$testGameConfigId")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(gameConfigDto)))
             .andExpect(status().isOk)
@@ -185,7 +185,7 @@ class GameConfigControllerTest {
             .andExpect(jsonPath("$.wrongAnswerPoints").value(-2))
             .andExpect(jsonPath("$.resultScreenTime").value(5000))
         
-        verify(gameConfigService).updateGameConfig(eq(testGameConfigId), any())
+        verify(gameConfigService).updateGameConfig(eq(testGameConfigId), any<GameConfigDto>())
     }
     
     @Test
