@@ -15,8 +15,9 @@ LICENSE
 *.swo
 *~
 
-# Build artifacts
+# Build artifacts (allow build/libs for runtime image)
 build/
+!build/libs/
 target/
 .gradle/
 !gradle/wrapper/gradle-wrapper.jar
