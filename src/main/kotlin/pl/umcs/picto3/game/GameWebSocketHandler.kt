@@ -109,7 +109,7 @@ class GameWebSocketHandler(
             )
             sendToSession(
                 wsSession,
-                GameMessage.PLAYER_JOINED.type,
+                GameMessage.PLAYER_WELCOME.type,
                 mapOf(
                     "playerWelcomeMessage" to "Welcome to picto game!",
                 )

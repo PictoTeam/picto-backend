@@ -3,6 +3,7 @@ package pl.umcs.picto3.game
 enum class GameMessage(val type: String) {
     // Player events
     PLAYER_JOINED("PLAYER_JOINED"),
+    PLAYER_WELCOME("PLAYER_WELCOME"),
     PLAYER_LEFT("PLAYER_LEFT"),
 
     // Admin events
