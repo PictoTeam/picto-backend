@@ -125,7 +125,7 @@ class GameWebSocketHandler(
         }
         gameSession.adminsWsSessions.add(wsSession.id)
 
-        logger.info { "✅ Admin connected to z game [${gameSession.accessCode}]" }
+        logger.info { "✅ Admin connected to game [${gameSession.accessCode}]" }
 
         CoroutineScope(Dispatchers.IO).launch {
             sendToSession(
@@ -169,8 +169,19 @@ class GameWebSocketHandler(
         val accessCode = variables["gameAccessCode"]
             ?: throw Exception("Missing gameAccessCode")
         val activeSession = sessionService.getSession(accessCode)
-        gameWsSession.remove(activeSession.accessCode)
-        logger.info { "⬅️ Player disconnected from to game [${accessCode}]" }
+        val sessionConnections = gameWsSession[activeSession.accessCode]
+        if (sessionConnections != null) {
+            val playerEntry = sessionConnections.entries.find { it.value.id == wsSession.id }
+            if (playerEntry != null) {
+                sessionConnections.remove(playerEntry.key)
+                logger.info { "⬅️ Player [${playerEntry.key}] disconnected from game [${accessCode}]" }
+            } else {
+                logger.warn { "Could not find player for disconnected session [${wsSession.id}] in game [${accessCode}]" }
+            }
+        } else {
+            logger.warn { "No session connections found for game [${accessCode}]" }
+        }
+        logger.info { "⬅️ Player disconnected from game [${accessCode}]" }
     }
 
     private suspend fun sendToMultipleSessions(
