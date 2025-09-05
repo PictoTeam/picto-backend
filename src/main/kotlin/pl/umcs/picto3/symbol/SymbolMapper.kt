@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component
 class SymbolMapper(
     private val symbolRepository: SymbolRepository
 ) {
-    private val serverPath = "src/main/resources/static/"
 
     fun toSymbolMatrixDto(entity: SymbolMatrix): SymbolMatrixDto {
         return SymbolMatrixDto(
@@ -20,7 +19,7 @@ class SymbolMapper(
         return SymbolPlacementDto(
             entity.rowIndex,
             entity.columnIndex,
-            serverPath + entity.symbol.fileName
+            "/static/symbols/" + entity.symbol.storedFileName
         )
     }
 
@@ -64,6 +63,13 @@ class SymbolMapper(
             rowIndex = dto.rowIndex,
             columnIndex = dto.columnIndex,
             symbol = symbol
+        )
+    }
+
+    fun toDto(symbol: Symbol): SymbolDto {
+        return SymbolDto(
+            id = symbol.id!!,
+            symbolPath = "/static/symbols/" + symbol.storedFileName
         )
     }
 }

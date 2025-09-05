@@ -15,11 +15,16 @@ class ImageController(
 
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadBatchImages(
-        @RequestParam("file") files: List<MultipartFile>,
+        @RequestParam("files") files: List<MultipartFile>,
         @RequestParam("names") names: List<String>,
     ): ResponseEntity<String> {
         storageService.uploadBatchImages(files, names)
         return ResponseEntity.ok("Files uploaded successfully")
+    }
+
+    @GetMapping
+    fun getAllImages(): ResponseEntity<List<ImageDto>> {
+        return ResponseEntity.ok(storageService.getAllImages())
     }
 
     @GetMapping("/{sessionAccessCode}")

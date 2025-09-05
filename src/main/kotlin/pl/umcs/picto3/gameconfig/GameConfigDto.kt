@@ -8,6 +8,8 @@ import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
 import java.util.*
 
 data class GameConfigDto(
+    val id: UUID? = null,
+
     @field:NotNull(message = "Symbols matrix is required")
     val symbols: SymbolMatrixConfigDto,
 

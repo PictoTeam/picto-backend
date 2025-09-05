@@ -9,6 +9,7 @@ import pl.umcs.picto3.image.ImageDto
 import pl.umcs.picto3.image.ImageMapper
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.symbol.Symbol
+import pl.umcs.picto3.symbol.SymbolDto
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrixDto
 import pl.umcs.picto3.symbol.SymbolRepository
@@ -36,6 +37,10 @@ class StorageService(
         }
     }
 
+    fun getAllImages(): List<ImageDto> {
+        return imageRepository.findAll().map { image -> imageMapper.toNotMainDto(image) }
+    }
+
     fun getImagesForRoundWithSessionAccessCode(sessionAccessCode: String): List<ImageDto> {
         val imagesForRound =
             gameService.getRandomImages(sessionAccessCode).toList().map { image -> imageMapper.toNotMainDto(image) }
@@ -58,7 +63,8 @@ class StorageService(
         if (imageRepository.findByStoredFileName(fileName) != null) {
             throw StorageException("file with given name: $fileName already exists")
         }
-        val storedFileName = storage.store(file)
+        val storedFilePath = storage.store(file, "images")
+        val storedFileName = storedFilePath.substringAfterLast("/")
         val image = Image(null, storedFileName, fileName, fileToSaveHash)
         return imageRepository.save(image)
     }
@@ -93,9 +99,14 @@ class StorageService(
         if (symbolRepository.findByStoredFileName(fileName) != null) {
             throw StorageException("file with given name: $fileName already exists")
         }
-        val storedFileName = storage.store(file, "symbols")
+        val storedFilePath = storage.store(file, "symbols")
+        val storedFileName = storedFilePath.substringAfterLast("/")
         val symbol = Symbol(null, storedFileName, fileName, fileToSaveHash)
         return symbolRepository.save(symbol)
+    }
+
+    fun getAllSymbols(): List<SymbolDto> {
+        return symbolRepository.findAll().map { symbol -> symbolMapper.toDto(symbol) }
     }
 
 }

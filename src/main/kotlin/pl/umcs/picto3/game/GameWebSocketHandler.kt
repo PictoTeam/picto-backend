@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GameWebSocketHandler(
-    private val gameRepository: GameRepository,
     private val sessionService: SessionService,
     private val objectMapper: ObjectMapper
 ) : TextWebSocketHandler() {
@@ -29,6 +28,21 @@ class GameWebSocketHandler(
     @EventListener
     fun handleSessionCreated(event: SessionCreatedEvent) {
         createNewSession(event.accessCode)
+    }
+
+    @EventListener
+    fun handleGameStarted(event: GameStartedEvent) {
+        logger.info { "🚀 Starting game session ${event.accessCode}" }
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToMultipleSessions(
+                gameWsSession[event.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
+                GameMessage.GAME_STARTED.type,
+                mapOf(
+                    "message" to "Game has started"
+                )
+            )
+        }
+        logger.info { "✅ Game ${event.accessCode} has started" }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
@@ -43,9 +57,9 @@ class GameWebSocketHandler(
 
     private fun processConnectionUrl(wsSession: WebSocketSession) {
         val uri = wsSession.uri ?: throw Exception("Missing data in url")
-        val pathSegments = uri.path.split("/")
+        val pathSegments = uri.path.split("/") // TODO: where is the url documented?
         if (pathSegments.size < 4) {
-            throw Exception("Invalid URL format. Expected: /games/{gameId}/{role}")
+            throw Exception("Invalid URL format. Expected: /games/{gameAccessCode}/{role}")
         }
 
         val accessCode = pathSegments[2]
@@ -127,12 +141,6 @@ class GameWebSocketHandler(
             val type = messageData["type"] as? String ?: throw Exception("Missing message type")
 
             when (type) {
-                "START_GAME" -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        handleStartGame(wsSession)
-                    }
-                }
-
                 else -> {
                     logger.warn { "Unknown message type: $type" }
                 }
@@ -149,23 +157,6 @@ class GameWebSocketHandler(
                 )
             }
         }
-    }
-
-    private suspend fun handleStartGame(session: WebSocketSession) {
-        logger.info { "🚀 Trying to start game session " }
-        val gameSessionAccessCode = sessionService.findSessionAccessCodeByAdminWsSession(session.id)
-        gameRepository.getGameBySessionAccessCode(gameSessionAccessCode)
-        logger.info { "✅ Game $gameSessionAccessCode has started" }
-        CoroutineScope(Dispatchers.IO).launch {
-            sendToMultipleSessions(
-                gameWsSession[gameSessionAccessCode]?.values?.toMutableSet() ?: mutableSetOf(),
-                GameMessage.GAME_STARTED.type,
-                mapOf(
-                    "gameStart" to "Game has started",
-                )
-            )
-        }
-
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {

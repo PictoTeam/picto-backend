@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import pl.umcs.picto3.game.Game
 import pl.umcs.picto3.game.GameRepository
+import pl.umcs.picto3.game.GameStartedEvent
 import pl.umcs.picto3.gameconfig.GameConfigRepository
 import pl.umcs.picto3.player.Player
 import java.util.*
@@ -38,6 +39,15 @@ class SessionService(
 
     fun getSession(accessCode: String): Session {
         return activeSessions[accessCode] ?: throw IllegalArgumentException("Session with code $accessCode not found")
+    }
+
+    fun startSession(accessCode: String): String {
+        if (sessionExists(accessCode)) {
+            applicationEventPublisher.publishEvent(GameStartedEvent(accessCode))
+            return "Game session $accessCode started successfully"
+        } else {
+            throw IllegalArgumentException("Session with code $accessCode not found")
+        }
     }
 
     fun addPlayerToSession(newPlayer: Player, sessionAccessCode: String) {
