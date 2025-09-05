@@ -35,7 +35,7 @@ class GameWebSocketHandler(
 
     @EventListener
     fun handleGameStarted(event: GameStartedEvent) {
-        logger.info { "🚀 Starting game session ${event.accessCode}" }
+        logger.info { "🚀 Starting game session [${event.accessCode}]" }
         CoroutineScope(Dispatchers.IO).launch {
             sendToMultipleSessions(
                 gameWsSession[event.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
@@ -45,11 +45,11 @@ class GameWebSocketHandler(
                 )
             )
         }
-        logger.info { "✅ Game ${event.accessCode} has started" }
+        logger.info { "✅ Game [${event.accessCode}] has started" }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
-        logger.info { "New connection: ${session.id}" }
+        logger.info { "New connection: [${session.id}]" }
         try {
             processConnectionUrl(session)
         } catch (e: Exception) {
@@ -91,11 +91,11 @@ class GameWebSocketHandler(
     }
 
     private fun autoJoinAsPlayer(wsSession: WebSocketSession, gameSession: Session) {
-        logger.info { "Player tries to join to game ➡️ [${gameSession.accessCode}]" }
+        logger.info { "➡️ Player tries to join to game [${gameSession.accessCode}]" }
 
         val accessCode = gameSession.accessCode
         val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSession.accessCode))
-        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: $accessCode" }
+        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$accessCode]" }
         sessionService.addPlayerToSession(newPlayer, accessCode)
         gameWsSession.get(gameSession.accessCode)?.put(newPlayer.id!!, wsSession)
 
@@ -118,14 +118,14 @@ class GameWebSocketHandler(
     }
 
     private fun autoJoinAsAdmin(wsSession: WebSocketSession, gameSession: Session, adminApiKey: String) {
-        logger.info { "👑 Admin tries to join to game${gameSession.accessCode}" }
+        logger.info { "👑 Admin tries to join to game [${gameSession.accessCode}]" }
 
         if (gameSession.adminApiKey != adminApiKey) {
             throw Exception("Wrong admin token!")
         }
         gameSession.adminsWsSessions.add(wsSession.id)
 
-        logger.info { "✅ Admin connected to z game ${gameSession.accessCode}" }
+        logger.info { "✅ Admin connected to z game [${gameSession.accessCode}]" }
 
         CoroutineScope(Dispatchers.IO).launch {
             sendToSession(
@@ -170,7 +170,7 @@ class GameWebSocketHandler(
             ?: throw Exception("Missing gameAccessCode")
         val activeSession = sessionService.getSession(accessCode)
         gameWsSession.remove(activeSession.accessCode)
-        logger.info { "Player disconnected from to game ⬅️ [${accessCode}]" }
+        logger.info { "⬅️ Player disconnected from to game [${accessCode}]" }
     }
 
     private suspend fun sendToMultipleSessions(
