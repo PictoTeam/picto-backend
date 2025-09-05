@@ -9,7 +9,9 @@ import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
+import org.springframework.web.util.UriTemplate
 import pl.umcs.picto3.player.Player
+import pl.umcs.picto3.player.PlayerRepository
 import pl.umcs.picto3.session.Session
 import pl.umcs.picto3.session.SessionCreatedEvent
 import pl.umcs.picto3.session.SessionService
@@ -18,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GameWebSocketHandler(
+    private val playerRepository: PlayerRepository,
     private val sessionService: SessionService,
     private val objectMapper: ObjectMapper
 ) : TextWebSocketHandler() {
@@ -32,7 +35,7 @@ class GameWebSocketHandler(
 
     @EventListener
     fun handleGameStarted(event: GameStartedEvent) {
-        logger.info { "🚀 Starting game session ${event.accessCode}" }
+        logger.info { "🚀 Starting game session [${event.accessCode}]" }
         CoroutineScope(Dispatchers.IO).launch {
             sendToMultipleSessions(
                 gameWsSession[event.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
@@ -42,11 +45,11 @@ class GameWebSocketHandler(
                 )
             )
         }
-        logger.info { "✅ Game ${event.accessCode} has started" }
+        logger.info { "✅ Game [${event.accessCode}] has started" }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
-        logger.info { "New connection: ${session.id}" }
+        logger.info { "New connection: [${session.id}]" }
         try {
             processConnectionUrl(session)
         } catch (e: Exception) {
@@ -57,13 +60,13 @@ class GameWebSocketHandler(
 
     private fun processConnectionUrl(wsSession: WebSocketSession) {
         val uri = wsSession.uri ?: throw Exception("Missing data in url")
-        val pathSegments = uri.path.split("/") // TODO: where is the url documented?
-        if (pathSegments.size < 4) {
-            throw Exception("Invalid URL format. Expected: /games/{gameAccessCode}/{role}")
-        }
+        val template = UriTemplate("/ws/games/{gameAccessCode}/{role}")
 
-        val accessCode = pathSegments[2]
-        val role = pathSegments[3]
+        val variables = template.match(uri.path)
+        val accessCode = variables["gameAccessCode"]
+            ?: throw Exception("Missing gameAccessCode")
+        val role = variables["role"]
+            ?: throw Exception("Missing role")
         if (sessionService.sessionExists(accessCode)) {
             val activeSession = sessionService.getSession(accessCode)
             when (role) {
@@ -88,11 +91,11 @@ class GameWebSocketHandler(
     }
 
     private fun autoJoinAsPlayer(wsSession: WebSocketSession, gameSession: Session) {
-        logger.info { "Player tries to join to game${gameSession.accessCode}" }
+        logger.info { "➡️ Player tries to join to game [${gameSession.accessCode}]" }
 
         val accessCode = gameSession.accessCode
-        val newPlayer = Player(sessionAccessCode = gameSession.accessCode)
-        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: $accessCode" }
+        val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSession.accessCode))
+        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$accessCode]" }
         sessionService.addPlayerToSession(newPlayer, accessCode)
         gameWsSession.get(gameSession.accessCode)?.put(newPlayer.id!!, wsSession)
 
@@ -106,7 +109,7 @@ class GameWebSocketHandler(
             )
             sendToSession(
                 wsSession,
-                GameMessage.ADMIN_CONNECTED.type,
+                GameMessage.PLAYER_WELCOME.type,
                 mapOf(
                     "playerWelcomeMessage" to "Welcome to picto game!",
                 )
@@ -115,14 +118,14 @@ class GameWebSocketHandler(
     }
 
     private fun autoJoinAsAdmin(wsSession: WebSocketSession, gameSession: Session, adminApiKey: String) {
-        logger.info { "👑 Admin tries to join to game${gameSession.accessCode}" }
+        logger.info { "👑 Admin tries to join to game [${gameSession.accessCode}]" }
 
         if (gameSession.adminApiKey != adminApiKey) {
             throw Exception("Wrong admin token!")
         }
         gameSession.adminsWsSessions.add(wsSession.id)
 
-        logger.info { "✅ Admin connected to z game ${gameSession.accessCode}" }
+        logger.info { "✅ Admin connected to game [${gameSession.accessCode}]" }
 
         CoroutineScope(Dispatchers.IO).launch {
             sendToSession(
@@ -159,8 +162,26 @@ class GameWebSocketHandler(
         }
     }
 
-    override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
-        //TODO implement this
+    override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
+        val uri = wsSession.uri ?: throw Exception("Missing data in url")
+        val template = UriTemplate("/ws/games/{gameAccessCode}/{role}")
+        val variables = template.match(uri.path)
+        val accessCode = variables["gameAccessCode"]
+            ?: throw Exception("Missing gameAccessCode")
+        val activeSession = sessionService.getSession(accessCode)
+        val sessionConnections = gameWsSession[activeSession.accessCode]
+        if (sessionConnections != null) {
+            val playerEntry = sessionConnections.entries.find { it.value.id == wsSession.id }
+            if (playerEntry != null) {
+                sessionConnections.remove(playerEntry.key)
+                logger.info { "⬅️ Player [${playerEntry.key}] disconnected from game [${accessCode}]" }
+            } else {
+                logger.warn { "Could not find player for disconnected session [${wsSession.id}] in game [${accessCode}]" }
+            }
+        } else {
+            logger.warn { "No session connections found for game [${accessCode}]" }
+        }
+        logger.info { "⬅️ Player disconnected from game [${accessCode}]" }
     }
 
     private suspend fun sendToMultipleSessions(
