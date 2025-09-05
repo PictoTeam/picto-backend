@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import pl.umcs.picto3.game.Game
 import pl.umcs.picto3.game.GameRepository
+import pl.umcs.picto3.game.GameStartedEvent
 import pl.umcs.picto3.gameconfig.GameConfigRepository
 import pl.umcs.picto3.player.Player
 import java.util.*

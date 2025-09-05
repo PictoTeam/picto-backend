@@ -12,14 +12,12 @@ import org.springframework.web.socket.handler.TextWebSocketHandler
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.session.Session
 import pl.umcs.picto3.session.SessionCreatedEvent
-import pl.umcs.picto3.session.GameStartedEvent
 import pl.umcs.picto3.session.SessionService
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GameWebSocketHandler(
-    private val gameRepository: GameRepository,
     private val sessionService: SessionService,
     private val objectMapper: ObjectMapper
 ) : TextWebSocketHandler() {
