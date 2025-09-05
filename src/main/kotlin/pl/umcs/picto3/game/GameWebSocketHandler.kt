@@ -61,7 +61,7 @@ class GameWebSocketHandler(
         val uri = wsSession.uri ?: throw Exception("Missing data in url")
         val pathSegments = uri.path.split("/") // TODO: where is the url documented?
         if (pathSegments.size < 4) {
-            throw Exception("Invalid URL format. Expected: /games/{gameId}/{role}") // TODO: shouldn't this be accessCode instead of gameId?
+            throw Exception("Invalid URL format. Expected: /games/{gameAccessCode}/{role}")
         }
 
         val accessCode = pathSegments[2]
