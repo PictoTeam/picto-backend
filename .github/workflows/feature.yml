@@ -48,6 +48,11 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
 
+    - name: Drop and recreate test database
+      run: |
+        PGPASSWORD=test psql -h localhost -U test -d postgres -c "DROP DATABASE IF EXISTS picto_test;"
+        PGPASSWORD=test psql -h localhost -U test -d postgres -c "CREATE DATABASE picto_test;"
+
     - name: Run tests
       run: ./gradlew test
       env:
