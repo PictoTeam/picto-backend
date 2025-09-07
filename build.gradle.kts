@@ -65,6 +65,11 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
+tasks.jar {
+	enabled = false
+	archiveClassifier = ""
+}
+
 tasks.dokkaHtml.configure {
 	outputDirectory.set(layout.buildDirectory.dir("dokka"))
 }
