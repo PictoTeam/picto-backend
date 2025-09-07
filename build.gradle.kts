@@ -12,6 +12,8 @@ plugins {
 group = "pl.umcs"
 version = "0.0.1-SNAPSHOT"
 
+base.archivesName.set("picto-backend")
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(24)

@@ -22,7 +22,7 @@ COPY src src
 RUN ./gradlew build -x test --no-daemon
 
 # Extract layers from the JAR
-RUN java -Djarmode=tools -jar build/libs/picto-backend-*.jar extract
+RUN java -Djarmode=layertools -jar build/libs/picto-backend-*.jar extract
 
 # Runtime stage
 FROM eclipse-temurin:24-jre-alpine
