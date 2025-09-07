@@ -12,6 +12,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler
 import org.springframework.web.util.UriTemplate
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.player.PlayerRepository
+import pl.umcs.picto3.round.RoundCompletedEvent
+import pl.umcs.picto3.round.RoundSummaryService
 import pl.umcs.picto3.session.Session
 import pl.umcs.picto3.session.SessionCreatedEvent
 import pl.umcs.picto3.session.SessionService
@@ -22,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 class GameWebSocketHandler(
     private val playerRepository: PlayerRepository,
     private val sessionService: SessionService,
+    private val roundSummaryService: RoundSummaryService,
     private val objectMapper: ObjectMapper
 ) : TextWebSocketHandler() {
 
@@ -46,6 +49,24 @@ class GameWebSocketHandler(
             )
         }
         logger.info { "✅ Game [${event.accessCode}] has started" }
+    }
+
+    @EventListener
+    fun handleRoundCompleted(event: RoundCompletedEvent) {
+        logger.info { "Round completed for session [${event.sessionAccessCode}]" }
+        CoroutineScope(Dispatchers.IO).launch {
+            val roundSummary = roundSummaryService.getRoundSummary(event.roundId)
+            if (roundSummary != null) {
+                sendToMultipleSessions(
+                    gameWsSession[event.sessionAccessCode]?.values?.toMutableSet() ?: mutableSetOf(),
+                    GameMessage.ROUND_SUMMARY.type,
+                    mapOf(
+                        "roundSummary" to roundSummary,
+                        "message" to if (event.wasSuccessful) "Round completed successfully!" else "Round completed"
+                    )
+                )
+            }
+        }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
