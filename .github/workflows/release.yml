@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - '*'  # Wszystkie tagi
 
 env:
   REGISTRY: ghcr.io
