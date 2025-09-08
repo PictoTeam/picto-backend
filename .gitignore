@@ -12,6 +12,9 @@ build/
 .env.*.local
 application-dev.yml
 
+# Data directories (bind volumes)
+data/
+
 # Production SSL certificates
 ssl/
 
