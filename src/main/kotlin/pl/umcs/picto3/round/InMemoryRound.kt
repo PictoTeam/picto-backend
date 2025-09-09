@@ -9,8 +9,8 @@ data class InMemoryRound(
     val speakerId: UUID,
     val randomImages: Set<UUID>,
     val topicImageId: UUID,
-    val speakerPickedSymbolsIds: Set<UUID> = mutableSetOf(),
-    val listenerPickedImageId: UUID? = null,
+    val speakerPickedSymbolsIds: List<UUID> = mutableListOf(),
     val speakerResponseTime: Int? = null,
+    val listenerPickedImageId: UUID? = null,
     val listenerResponseTime: Int? = null
 )

@@ -22,6 +22,7 @@ import pl.umcs.picto3.game.communication.MessageWrapper
 import pl.umcs.picto3.game.communication.SpeakerSymbolsPickedData
 import pl.umcs.picto3.game.communication.getAccessCode
 import pl.umcs.picto3.game.communication.getPlayerId
+import pl.umcs.picto3.game.communication.getRoundId
 import pl.umcs.picto3.game.communication.setAccessCode
 import pl.umcs.picto3.game.communication.setPlayerId
 import pl.umcs.picto3.matchmaker.MatchMaker
@@ -32,6 +33,8 @@ import pl.umcs.picto3.round.InMemoryRound
 import pl.umcs.picto3.session.Session
 import pl.umcs.picto3.session.SessionCreatedEvent
 import pl.umcs.picto3.session.SessionService
+import pl.umcs.picto3.symbol.SymbolMapper
+import pl.umcs.picto3.symbol.SymbolMatrixDto
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -40,7 +43,8 @@ class GameWebSocketHandler(
     private val playerRepository: PlayerRepository,
     private val sessionService: SessionService,
     private val objectMapper: ObjectMapper,
-    private val matchMaker: MatchMaker
+    private val matchMaker: MatchMaker,
+    private val symbolMapper: SymbolMapper
 ) : TextWebSocketHandler() {
 
     private val logger = KotlinLogging.logger {}
@@ -74,9 +78,12 @@ class GameWebSocketHandler(
         matchMaker.onPairReady = { p1, p2 ->
             val game = games[p2.wsSession.getAccessCode()!!]
             val randomImages =
-                game?.gameConfig?.images?.shuffled()?.take(3)?.mapNotNull { it.id }?.toSet() ?: emptySet()
+                game?.gameConfig?.images?.shuffled()?.take(game.gameConfig.speakerImageCount.toInt())
+                    ?.mapNotNull { it.id }?.toSet() ?: emptySet()
             val topicImageId = randomImages.randomOrNull() ?: UUID.randomUUID()
-            game?.gameRounds?.add(
+            val newRoundId = UUID.randomUUID()
+            game?.gameRounds?.put(
+                newRoundId,
                 InMemoryRound(
                     p2.wsSession.getAccessCode()!!,
                     p1.id!!,
@@ -85,6 +92,14 @@ class GameWebSocketHandler(
                     topicImageId
                 )
             )
+            startRoundForSpeaker(
+                p2.wsSession,
+                randomImages,
+                topicImageId,
+                symbolMapper.toSymbolMatrixDto(game?.gameConfig?.symbols!!),
+                game.gameConfig.speakerAnswerTime
+            )
+            startRoundForListener(p1.wsSession)
         }
     }
 
@@ -186,12 +201,22 @@ class GameWebSocketHandler(
             when (messageWrapper.type) {
                 PlayerMessageType.LISTENER_IMAGE_PICKED.type -> {
                     val data = objectMapper.convertValue(messageWrapper.data, ListenerImagePickedData::class.java)
-                    handleListenerPick(wsSession.getAccessCode()!!, wsSession.getPlayerId(), data)
+                    handleListenerPick(wsSession.getAccessCode()!!, wsSession.getRoundId()!!, data)
+
                 }
 
                 PlayerMessageType.SPEAKER_SYMBOLS_PICKED.type -> {
                     val data = objectMapper.convertValue(messageWrapper.data, SpeakerSymbolsPickedData::class.java)
-                    handleSpeakerPicks(wsSession.getAccessCode()!!, wsSession.getPlayerId(), data)
+                    handleSpeakerPicks(wsSession.getAccessCode()!!, wsSession.getRoundId(), data)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        sendToSession(
+                            wsSession,
+                            GameMessage.SPEAKER_STAGE_2.type,
+                            mapOf(
+                                "info" to "Listener is picking answer",
+                            )
+                        )
+                    }
                 }
 
                 else -> {
@@ -212,19 +237,102 @@ class GameWebSocketHandler(
         }
     }
 
-    private fun handleSpeakerPicks(accessCode: String, playerId: UUID?, data: SpeakerSymbolsPickedData) {
-        val pickedSymbolsCount = data.symbols.size.toShort()
-        games[accessCode]?.let {
-            if (pickedSymbolsCount < it.gameConfig.speakerImageCount) {
+    private fun handleSpeakerPicks(accessCode: String, roundId: UUID?, data: SpeakerSymbolsPickedData) {
+        if (roundId == null) {
+            logger.warn { "Round ID is null for access code: $accessCode" }
+            return
+        }
+
+        val game = games[accessCode] ?: run {
+            logger.warn { "Game not found for access code: $accessCode" }
+            return
+        }
+
+        val round = game.gameRounds[roundId] ?: run {
+            logger.warn { "Round not found for ID: $roundId" }
+            return
+        }
+
+        val pickedSymbolsCount = data.symbols.size
+        val requiredCount = game.gameConfig.speakerImageCount.toInt()
+
+        when {
+            pickedSymbolsCount < requiredCount -> {
                 TODO("Exception to inform user to pick more symbols")
             }
-            if (pickedSymbolsCount > it.gameConfig.speakerImageCount) {
+
+            pickedSymbolsCount > requiredCount -> {
                 TODO("Exception to inform user to pick less symbols")
+            }
+
+            else -> {
+                val symbolUUIDs = data.symbols.map { UUID.fromString(it) }
+                val updatedRound = round.copy(
+                    speakerPickedSymbolsIds = symbolUUIDs,
+                    speakerResponseTime = data.speakerResponseTime
+                )
+                game.gameRounds[roundId] = updatedRound
             }
         }
     }
 
-    private fun handleListenerPick(accessCode: String, playerId: UUID?, data: ListenerImagePickedData) {
+    private fun startRoundForSpeaker(
+        wsSession: WebSocketSession,
+        randomImages: Set<UUID>,
+        topicImageId: UUID,
+        symbolMatrix: SymbolMatrixDto,
+        speakerAnswerTime: Int
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToSession(
+                wsSession,
+                GameMessage.SPEAKER_STAGE_1.type,
+                mapOf(
+                    "images" to randomImages,
+                    "topic" to topicImageId,
+                    "symbolMatrix" to symbolMatrix,
+                    "answerTime" to speakerAnswerTime
+                )
+            )
+        }
+    }
+
+    private fun startRoundForListener(wsSession: WebSocketSession) {
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToSession(
+                wsSession,
+                GameMessage.LISTENER_STAGE_1.type,
+                mapOf(
+                    "info" to "Speaker is picking question",
+                )
+            )
+        }
+    }
+
+    private fun handleListenerPick(accessCode: String, roundId: UUID?, data: ListenerImagePickedData) {
+        if (roundId == null) {
+            logger.warn { "Round ID is null for access code: $accessCode" }
+            return
+        }
+
+        val game = games[accessCode] ?: run {
+            logger.warn { "Game not found for access code: $accessCode" }
+            return
+        }
+
+        val round = game.gameRounds[roundId] ?: run {
+            logger.warn { "Round not found for ID: $roundId" }
+            return
+        }
+        val updatedRound = round.copy(
+            listenerPickedImageId = data.imageId,
+            listenerResponseTime = data.listenerResponseTime,
+        )
+        game.gameRounds[roundId] = updatedRound
+        // jeszcze zaznaczenie ze oni grali teraz razem i dodanie ich do puli
+//        1.tutaj funkcja ktora wysle z opoznieniem graczy znowu do puli
+//        2.pozniej nastepuje zapis rundy do bazy w osobnym threadzie
+//        3.na sam koniec gracze dostaja odpowiedz czy ich odpowiedz sie zgadzala czy nie
 
     }
 

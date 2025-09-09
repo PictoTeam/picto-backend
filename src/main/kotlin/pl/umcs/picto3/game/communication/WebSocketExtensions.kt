@@ -18,3 +18,12 @@ fun WebSocketSession.setAccessCode(accessCode: String) {
 fun WebSocketSession.getAccessCode(): String? {
     return this.attributes["accessCode"] as? String
 }
+
+fun WebSocketSession.setRoundId(roundId: UUID) {
+    this.attributes["roundId"] = roundId
+}
+
+fun WebSocketSession.getRoundId(): UUID? {
+    return this.attributes["roundId"] as? UUID
+}
+
