@@ -1,103 +1,154 @@
-# Picto Backend
+# Picto
 
-Spring Boot application for Picto game backend with WebSocket support.
+---
 
-## 🚀 Quick Start
+## Zcentralizowany error handler
 
-### Prerequisites
+---
 
-- Java 24
-- Docker and Docker Compose
-- Git
+## Stworzenie matchMakera
 
-### Running with Docker Compose
+1. podejście iteracyjne w ramach stage'y danych rund
+2. freeze obecnego stanu w ramach pauzy
+3. zatrzymanie tworzenia się nowych rund
 
-### Running with Docker Compose (Development)
+---
 
-1. Clone the repository:
-```bash
-git clone https://github.com/PictoTeam/picto-backend.git
-cd picto-backend
+## Serwis do websocketów z funkcjami manipulującymi graczem
+
+### 1. heartbeat (5 sec z timeoutem):
+
+- **1.** heartbeat (usuwać z puli, jeżeli się w niej znajduje)  
+- **2.** heartbeat (mogą być problemy partnera)  
+- **3–5.** heartbeat (próbuje przywrócić twojego partnera)  
+- **6.** heartbeat (przerwanie rundy)
+
+### 2. action
+
+- stwórz konstelację symboli
+
+### 3. answer
+
+- wybierz odpowiedź
+
+### 4. wait
+
+- poczekaj na "słowo" (akcja dla obydwu stron)
+
+### 5. informacja zwrotna
+
+- zgadzają się czy nie?
+- może ile punktów?
+
+---
+
+## Deploy
+
+Aplikacja posiada automatyczny deployment poprzez GitHub Actions:
+
+### Feature Branches
+- **Trigger**: Push do branchy `feature/**` lub Pull Request
+- **Proces**:
+  1. Build aplikacji Gradle
+  2. Build i push obrazu Docker do GitHub Container Registry
+  3. Tagi: `feature-{branch}`, `feature-{branch}-{sha}`
+
+### Release
+- **Trigger**: Push tagu (np. `v1.0.0`)
+- **Proces**:
+  1. Build aplikacji Gradle
+  2. Build i push obrazu Docker z tagami semantic versioning
+  3. Utworzenie GitHub Release
+  4. Tagi Docker: `latest`, `{version}`, `{major}.{minor}`, `{major}`
+
+### Obrazy Docker
+Obrazy są dostępne w GitHub Container Registry:
+```
+ghcr.io/pictoteam/picto-backend:latest
+ghcr.io/pictoteam/picto-backend:v1.0.0
 ```
 
-2. Set up environment variables:
+### Deployment do środowiska
 ```bash
-cp .env.example .env
-# Edit .env file with your configuration
-```
-
-3. Start PostgreSQL database:
-```bash
+# Development
 docker-compose up -d
-```
 
-### Running locally (Development)
-
-1. Start PostgreSQL database:
-```bash
-docker-compose up postgres -d
-```
-
-2. Run the application:
-```bash
-./gradlew bootRun
-```
-
-### Production Deployment
-
-1. Set up production environment:
-```bash
-cp .env.prod.example .env.prod
-# Edit .env.prod with your production configuration
-```
-
-2. Deploy to production:
-```bash
-./deploy-prod.sh
-```
-
-Or manually:
-```bash
+# Production  
 docker-compose -f compose.prod.yaml up -d
 ```
 
-The production setup includes:
-- Application container with resource limits
-- PostgreSQL database with persistent storage
-- Nginx reverse proxy with SSL support
-- Health checks and auto-restart policies
-- Security headers and rate limiting
+---
 
-2. Run the application:
-```bash
-./gradlew bootRun
-```
+## TODO
 
-## 🐳 Docker
+### Wgranie zasobów
 
-### Building the image
+- [ ] Wgranie obrazków na serwer/dolaczenie ich do kontekstu
+- [ ] Wgranie symboli na serwer/dolaczenie ich do kontekstu
 
-```bash
-docker build -t picto-backend .
-```
+### Setupowanie gry 0.1 (przetestować)
 
-### Running the container
+- [ ] reużywalność configów
 
-```bash
-docker run -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/picto \
-  -e SPRING_DATASOURCE_USERNAME=postgres \
-  -e SPRING_DATASOURCE_PASSWORD=postgres \
-  picto-backend
-```
+### Dołączenie do gry
 
-## 🔧 Development
+- [ ] dobicie się po ID
+- [ ] powiązanie z pseudonimem
+- [ ] trackowanie wszystkich userów w ramach sesji
+- [ ] nawiązanie socketu
+- [ ] ustawienie jego stanu na ready/in matchmaker
 
-### Running tests
+---
 
-```bash
-./gradlew test
-```
+## Przebieg gry ← websocket, główna pętla
+
+### Wystartować grę
+
+- [ ] info dla MM: hej, dobieraj pary
+- [ ] kiedy para is found → emit zmiany czynności
+- [ ] powinien przejść cykl aktywności:
+
+#### 1. Initial mówca
+
+- [ ] action
+- [ ] wait (poczekaj na odpowiedź)
+- [ ] informacja zwrotna
+- [ ] wróć do puli
+
+#### 2. Initial listener
+
+- [ ] wait (poczekaj aż opponent wybierze)
+- [ ] answer
+- [ ] informacja zwrotna
+- [ ] wróć do puli
+
+- [ ] zapisz rundę (async bo serwer się zatryzma xd)
+- [ ] przekazanie pary z oznaczeniem, że się widzieli, do MMa
+
+---
+
+### Ponowny rejoin do gry
+
+#### 1. w trakcie rundy
+
+- [ ] heartbeat > 6 → wróć do puli MM, szukać nowego & cancel poprzedniej rundy (wyczyszczenie rundy z pamięci)
+- [ ] heartbeat <= 6 → runda/MM będzie znać stany, więc płynnie powracamy do etapu/iteracji, w której był
+
+#### 2. w trakcie czekania na parę
+
+- [ ] podejście z heartbeata de facto
+
+---
+
+## Zakończenie gry
+
+- [ ] hej MM, nie startuj nowych rund
+
+---
+
+## Optional <Podsumowanie>
+
+- [ ] Szanowny Pan Kosela musi powiedzieć co chce
 
 ### Building the application
 
