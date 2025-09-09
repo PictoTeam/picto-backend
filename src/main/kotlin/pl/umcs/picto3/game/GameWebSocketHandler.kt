@@ -1,7 +1,14 @@
 package pl.umcs.picto3.game
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kotlinx.coroutines.*
+import jakarta.annotation.PostConstruct
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -10,42 +17,75 @@ import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import org.springframework.web.util.UriTemplate
+import pl.umcs.picto3.game.communication.ListenerImagePickedData
+import pl.umcs.picto3.game.communication.MessageWrapper
+import pl.umcs.picto3.game.communication.SpeakerSymbolsPickedData
+import pl.umcs.picto3.game.communication.getAccessCode
+import pl.umcs.picto3.game.communication.getPlayerId
+import pl.umcs.picto3.game.communication.setAccessCode
+import pl.umcs.picto3.game.communication.setPlayerId
+import pl.umcs.picto3.matchmaker.MatchMaker
 import pl.umcs.picto3.player.Player
+import pl.umcs.picto3.player.PlayerMessageType
 import pl.umcs.picto3.player.PlayerRepository
+import pl.umcs.picto3.round.InMemoryRound
 import pl.umcs.picto3.session.Session
 import pl.umcs.picto3.session.SessionCreatedEvent
 import pl.umcs.picto3.session.SessionService
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class GameWebSocketHandler(
     private val playerRepository: PlayerRepository,
     private val sessionService: SessionService,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val matchMaker: MatchMaker
 ) : TextWebSocketHandler() {
 
     private val logger = KotlinLogging.logger {}
-    private val gameWsSession = ConcurrentHashMap<String, ConcurrentHashMap<UUID, WebSocketSession>>()
+    private val games: MutableMap<String, InMemoryGameDto> = ConcurrentHashMap()
 
     @EventListener
     fun handleSessionCreated(event: SessionCreatedEvent) {
-        createNewSession(event.accessCode)
+        games.put(event.accessCode, InMemoryGameDto(gameConfig = event.gameConfig))
     }
 
     @EventListener
     fun handleGameStarted(event: GameStartedEvent) {
+        matchMaker.isGameGoing = true
         logger.info { "🚀 Starting game session [${event.accessCode}]" }
         CoroutineScope(Dispatchers.IO).launch {
-            sendToMultipleSessions(
-                gameWsSession[event.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
-                GameMessage.GAME_STARTED.type,
-                mapOf(
-                    "message" to "Game has started"
+            games[event.accessCode]?.webSocketSessions?.let {
+                sendToMultipleSessions(
+                    it,
+                    GameMessage.GAME_STARTED.type,
+                    mapOf(
+                        "message" to "Game has started"
+                    )
+                )
+            }
+        }
+        logger.info { "✅ Game [${event.accessCode}] has started" }
+    }
+
+    @PostConstruct
+    fun initMatchMaker() {
+        matchMaker.onPairReady = { p1, p2 ->
+            val game = games[p2.wsSession.getAccessCode()!!]
+            val randomImages =
+                game?.gameConfig?.images?.shuffled()?.take(3)?.mapNotNull { it.id }?.toSet() ?: emptySet()
+            val topicImageId = randomImages.randomOrNull() ?: UUID.randomUUID()
+            game?.gameRounds?.add(
+                InMemoryRound(
+                    p2.wsSession.getAccessCode()!!,
+                    p1.id!!,
+                    p2.id!!,
+                    randomImages,
+                    topicImageId
                 )
             )
         }
-        logger.info { "✅ Game [${event.accessCode}] has started" }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
@@ -67,6 +107,7 @@ class GameWebSocketHandler(
             ?: throw Exception("Missing gameAccessCode")
         val role = variables["role"]
             ?: throw Exception("Missing role")
+        wsSession.setAccessCode(accessCode)
         if (sessionService.sessionExists(accessCode)) {
             val activeSession = sessionService.getSession(accessCode)
             when (role) {
@@ -93,20 +134,21 @@ class GameWebSocketHandler(
     private fun autoJoinAsPlayer(wsSession: WebSocketSession, gameSession: Session) {
         logger.info { "➡️ Player tries to join to game [${gameSession.accessCode}]" }
 
-        val accessCode = gameSession.accessCode
-        val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSession.accessCode))
-        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$accessCode]" }
-        sessionService.addPlayerToSession(newPlayer, accessCode)
-        gameWsSession.get(gameSession.accessCode)?.put(newPlayer.id!!, wsSession)
-
+        val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSession.accessCode, wsSession = wsSession))
+        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$gameSession.accessCode]" }
+        sessionService.addPlayerToSession(newPlayer, gameSession.accessCode)
+        wsSession.setPlayerId(newPlayer.id!!)
+        matchMaker.addPlayerToQueue(newPlayer)
         CoroutineScope(Dispatchers.IO).launch {
-            sendToMultipleSessions(
-                gameWsSession[gameSession.accessCode]?.values?.toMutableSet() ?: mutableSetOf(),
-                GameMessage.PLAYER_JOINED.type,
-                mapOf(
-                    "newPlayerJoined" to "New player just joined session",
+            games[gameSession.accessCode]?.webSocketSessions?.let {
+                sendToMultipleSessions(
+                    it,
+                    GameMessage.PLAYER_JOINED.type,
+                    mapOf(
+                        "newPlayerJoined" to "New player just joined session",
+                    )
                 )
-            )
+            }
             sendToSession(
                 wsSession,
                 GameMessage.PLAYER_WELCOME.type,
@@ -140,12 +182,20 @@ class GameWebSocketHandler(
 
     override fun handleTextMessage(wsSession: WebSocketSession, message: TextMessage) {
         try {
-            val messageData = objectMapper.readValue(message.payload, Map::class.java) as Map<String, Any>
-            val type = messageData["type"] as? String ?: throw Exception("Missing message type")
+            val messageWrapper = objectMapper.readValue(message.payload, MessageWrapper::class.java)
+            when (messageWrapper.type) {
+                PlayerMessageType.LISTENER_IMAGE_PICKED.type -> {
+                    val data = objectMapper.convertValue(messageWrapper.data, ListenerImagePickedData::class.java)
+                    handleListenerPick(wsSession.getAccessCode()!!, wsSession.getPlayerId(), data)
+                }
 
-            when (type) {
+                PlayerMessageType.SPEAKER_SYMBOLS_PICKED.type -> {
+                    val data = objectMapper.convertValue(messageWrapper.data, SpeakerSymbolsPickedData::class.java)
+                    handleSpeakerPicks(wsSession.getAccessCode()!!, wsSession.getPlayerId(), data)
+                }
+
                 else -> {
-                    logger.warn { "Unknown message type: $type" }
+                    logger.warn { "Unknown message type: ${messageWrapper.type}" }
                 }
             }
         } catch (e: Exception) {
@@ -162,26 +212,27 @@ class GameWebSocketHandler(
         }
     }
 
-    override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
-        val uri = wsSession.uri ?: throw Exception("Missing data in url")
-        val template = UriTemplate("/ws/games/{gameAccessCode}/{role}")
-        val variables = template.match(uri.path)
-        val accessCode = variables["gameAccessCode"]
-            ?: throw Exception("Missing gameAccessCode")
-        val activeSession = sessionService.getSession(accessCode)
-        val sessionConnections = gameWsSession[activeSession.accessCode]
-        if (sessionConnections != null) {
-            val playerEntry = sessionConnections.entries.find { it.value.id == wsSession.id }
-            if (playerEntry != null) {
-                sessionConnections.remove(playerEntry.key)
-                logger.info { "⬅️ Player [${playerEntry.key}] disconnected from game [${accessCode}]" }
-            } else {
-                logger.warn { "Could not find player for disconnected session [${wsSession.id}] in game [${accessCode}]" }
+    private fun handleSpeakerPicks(accessCode: String, playerId: UUID?, data: SpeakerSymbolsPickedData) {
+        val pickedSymbolsCount = data.symbols.size.toShort()
+        games[accessCode]?.let {
+            if (pickedSymbolsCount < it.gameConfig.speakerImageCount) {
+                TODO("Exception to inform user to pick more symbols")
             }
-        } else {
-            logger.warn { "No session connections found for game [${accessCode}]" }
+            if (pickedSymbolsCount > it.gameConfig.speakerImageCount) {
+                TODO("Exception to inform user to pick less symbols")
+            }
         }
-        logger.info { "⬅️ Player disconnected from game [${accessCode}]" }
+    }
+
+    private fun handleListenerPick(accessCode: String, playerId: UUID?, data: ListenerImagePickedData) {
+
+    }
+
+    override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
+        games[wsSession.getAccessCode()]?.webSocketSessions?.removeIf { it.id == wsSession.id }
+        val playerToRemove = playerRepository.getReferenceById(wsSession.getPlayerId()!!)
+        matchMaker.removePlayerFromQueue(playerToRemove)
+        logger.info { "⬅️ Player disconnected from game [${wsSession.getAccessCode()}]" }
     }
 
     private suspend fun sendToMultipleSessions(
@@ -231,11 +282,5 @@ class GameWebSocketHandler(
                 "timestamp" to System.currentTimeMillis()
             )
         )
-    }
-
-
-    fun createNewSession(accessCode: String) {
-        val newSessionWsConnections = ConcurrentHashMap<UUID, WebSocketSession>()
-        gameWsSession.put(accessCode, newSessionWsConnections)
     }
 }

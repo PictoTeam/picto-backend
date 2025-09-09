@@ -5,7 +5,8 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import pl.umcs.picto3.symbol.SymbolMatrixConfigDto
-import java.util.*
+import java.util.UUID
+
 
 data class GameConfigDto(
     val id: UUID? = null,

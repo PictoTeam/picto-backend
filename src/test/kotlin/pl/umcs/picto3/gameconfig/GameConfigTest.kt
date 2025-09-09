@@ -10,7 +10,7 @@ class GameConfigTest {
     
     @Test
     fun `test GameConfig creation with default values`() {
-        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
+        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptyList())
         val images = setOf(Image(id = null, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
 
         val gameConfig = GameConfig(
@@ -35,7 +35,7 @@ class GameConfigTest {
     
     @Test
     fun `test GameConfig creation with custom values`() {
-        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
+        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptyList())
         val images = setOf(Image(id = null, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
         val createdAt = Instant.now()
 
@@ -68,7 +68,7 @@ class GameConfigTest {
     
     @Test
     fun `test GameConfig data class equality`() {
-        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptySet())
+        val symbolMatrix = SymbolMatrix(id = null, rowSize = 3, columnSize = 3, symbolPlacements = emptyList())
         val images = setOf(Image(id = null, storedFileName = "test.jpg", fileName = "Test Image", fileHash = "hash123"))
         val createdAt = Instant.now()
 

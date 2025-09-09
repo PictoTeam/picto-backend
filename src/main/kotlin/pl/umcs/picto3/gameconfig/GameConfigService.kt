@@ -1,7 +1,8 @@
 package pl.umcs.picto3.gameconfig
 
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
+
 
 @Service
 class GameConfigService(

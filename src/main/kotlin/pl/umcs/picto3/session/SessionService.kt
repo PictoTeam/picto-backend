@@ -8,13 +8,13 @@ import pl.umcs.picto3.game.GameRepository
 import pl.umcs.picto3.game.GameStartedEvent
 import pl.umcs.picto3.gameconfig.GameConfigRepository
 import pl.umcs.picto3.player.Player
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class SessionService(
-    @Value("{admin.game.api-key}:dev-admin-key")
-    private var adminGameApiKey: String,
+    @Value("\${admin.game.api-key}")
+    private var adminGameApiKey: String = "dev-admin-key",
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val gameConfigRepository: GameConfigRepository,
     private val gameRepository: GameRepository
@@ -29,7 +29,7 @@ class SessionService(
         val newGame = Game(gameConfig = gameConfig, sessionAccessCode = newCreatedSessionAccessCode)
         gameRepository.save(newGame)
         activeSessions[newCreatedSessionAccessCode] = newSession
-        applicationEventPublisher.publishEvent(SessionCreatedEvent(newCreatedSessionAccessCode))
+        applicationEventPublisher.publishEvent(SessionCreatedEvent(newCreatedSessionAccessCode, gameConfig))
         return newCreatedSessionAccessCode
     }
 

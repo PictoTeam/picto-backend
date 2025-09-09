@@ -1,6 +1,7 @@
 package pl.umcs.picto3.image
 
-import java.util.*
+import java.util.UUID
+
 
 data class ImageDto(
     val imagePath: String,

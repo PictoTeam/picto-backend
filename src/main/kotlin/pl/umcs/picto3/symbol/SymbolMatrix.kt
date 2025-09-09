@@ -1,7 +1,15 @@
 package pl.umcs.picto3.symbol
 
-import jakarta.persistence.*
-import java.util.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
+import java.util.UUID
+
 
 @Entity
 @Table(name = "symbol_matrices")
@@ -17,5 +25,6 @@ data class SymbolMatrix(
     val columnSize: Short = 3,
 
     @OneToMany
-    val symbolPlacements: Set<SymbolPlacement>
+    @JoinColumn(name = "symbol_matrix_id")
+    val symbolPlacements: List<SymbolPlacement>
 )

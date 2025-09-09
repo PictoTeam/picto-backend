@@ -38,8 +38,6 @@ class GameConfigControllerIntegrationTest {
     @Autowired
     private lateinit var symbolRepository: SymbolRepository
 
-    @Autowired
-    private lateinit var symbolPlacementRepository: SymbolPlacementRepository
 
     @Autowired
     private lateinit var imageRepository: ImageRepository
@@ -47,8 +45,6 @@ class GameConfigControllerIntegrationTest {
     @Autowired
     private lateinit var symbolMapper: SymbolMapper
 
-    @Autowired
-    private lateinit var gameConfigMapper: GameConfigMapper
 
     @Test
     fun `test get all game configs`() {
@@ -56,7 +52,7 @@ class GameConfigControllerIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 
@@ -100,7 +96,7 @@ class GameConfigControllerIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 
@@ -199,7 +195,7 @@ class GameConfigControllerIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 
@@ -258,7 +254,7 @@ class GameConfigControllerIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 

@@ -1,13 +1,23 @@
 package pl.umcs.picto3.round
 
-import jakarta.persistence.*
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import pl.umcs.picto3.game.Game
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.Symbol
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
+
 
 @Entity
 @Table(name = "rounds")
@@ -21,9 +31,11 @@ data class Round(
     val game: Game,
 
     @ManyToOne
+    @JoinColumn(name = "listener_id")
     val listener: Player,
 
     @ManyToOne
+    @JoinColumn(name = "speaker_id")
     val speaker: Player,
 
     @ManyToOne
@@ -35,6 +47,7 @@ data class Round(
     val selectedImage: Image?,
 
     @OneToMany
+    @JoinColumn(name = "round_id")
     val selectedSymbols: List<Symbol> = emptyList(),
 
     @Column(name = "speaker_response_time_ms")

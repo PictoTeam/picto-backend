@@ -1,6 +1,7 @@
 package pl.umcs.picto3.symbol
 
-import java.util.*
+import java.util.UUID
+
 
 data class SymbolMatrixConfigDto(
     val rowSize: Short,
