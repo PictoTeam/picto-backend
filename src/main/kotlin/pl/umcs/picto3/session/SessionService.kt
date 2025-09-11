@@ -19,7 +19,6 @@ class SessionService(
     private val gameConfigRepository: GameConfigRepository,
     private val gameRepository: GameRepository
 ) {
-    private val activeSessions = ConcurrentHashMap<String, Session>()
 
     fun createSession(gameConfigId: UUID): String {
         val gameConfig =
@@ -28,17 +27,12 @@ class SessionService(
         val newSession = Session(gameConfig, newCreatedSessionAccessCode, adminApiKey = adminGameApiKey)
         val newGame = Game(gameConfig = gameConfig, sessionAccessCode = newCreatedSessionAccessCode)
         gameRepository.save(newGame)
-        activeSessions[newCreatedSessionAccessCode] = newSession
         applicationEventPublisher.publishEvent(SessionCreatedEvent(newCreatedSessionAccessCode, gameConfig))
         return newCreatedSessionAccessCode
     }
 
     fun sessionExists(sessionId: String): Boolean {
         return activeSessions.containsKey(sessionId)
-    }
-
-    fun getSession(accessCode: String): Session {
-        return activeSessions[accessCode] ?: throw IllegalArgumentException("Session with code $accessCode not found")
     }
 
     fun startSession(accessCode: String): String {
@@ -50,17 +44,6 @@ class SessionService(
         }
     }
 
-    fun addPlayerToSession(newPlayer: Player, sessionAccessCode: String) {
-        val session = activeSessions[sessionAccessCode]
-            ?: throw IllegalArgumentException("Session with code $sessionAccessCode not found")
-        session.activeMembers.add(newPlayer)
-    }
-
-    fun findSessionAccessCodeByAdminWsSession(sessionAccessCode: String): String {
-        return activeSessions.values.find { session ->
-            session.adminsWsSessions.contains(sessionAccessCode)
-        }?.accessCode ?: throw TODO("lepsza obsluga bledu tutaj raczej rzadzko bedzie wiec luz")
-    }
 
     private fun generateUniqueJoinCode(): String {
         var code: String

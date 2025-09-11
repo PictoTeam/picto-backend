@@ -4,6 +4,6 @@ import java.util.UUID
 
 data class SpeakerSymbolsPickedData(
     val roundId: UUID,
-    val symbols: List<String>,
+    val symbolsIds: List<UUID>,
     val speakerResponseTime: Int,
 )

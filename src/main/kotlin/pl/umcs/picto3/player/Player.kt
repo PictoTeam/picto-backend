@@ -18,12 +18,12 @@ data class Player(
     val id: UUID? = null,
 
     @Transient
-    val wsSession: WebSocketSession,
+    var wsSession: WebSocketSession? = null,
 
     @Transient
     val sessionAccessCode: String,
 
     @Transient
-    var lastPlayerId: UUID? = null
+    var lastOpponentId: UUID? = null
 
 )

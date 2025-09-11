@@ -7,7 +7,7 @@ data class InMemoryRound(
     val gameAccessCode: String,
     val listenerId: UUID,
     val speakerId: UUID,
-    val randomImages: Set<UUID>,
+    val randomImagesIds: Set<UUID>,
     val topicImageId: UUID,
     val speakerPickedSymbolsIds: List<UUID> = mutableListOf(),
     val speakerResponseTime: Int? = null,

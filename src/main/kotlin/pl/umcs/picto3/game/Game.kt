@@ -3,8 +3,6 @@ package pl.umcs.picto3.game
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
@@ -13,15 +11,13 @@ import org.hibernate.annotations.CreationTimestamp
 import pl.umcs.picto3.gameconfig.GameConfig
 import pl.umcs.picto3.round.Round
 import java.time.LocalDateTime
-import java.util.UUID
 
 
 @Entity
 @Table(name = "games")
 data class Game(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID? = null,
+    val id: String,
 
     @ManyToOne
     val gameConfig: GameConfig,

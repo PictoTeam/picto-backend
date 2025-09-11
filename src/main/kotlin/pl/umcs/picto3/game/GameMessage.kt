@@ -15,6 +15,7 @@ enum class GameMessage(val type: String) {
     // Admin events
     ADMIN_CONNECTED("ADMIN_CONNECTED"),
 
+    ROUND_RESULT("ROUND_RESULT"),
     GAME_STARTED("GAME_STARTED"),
     ERROR("ERROR"),
 }

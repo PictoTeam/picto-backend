@@ -31,7 +31,7 @@ class MatchMaker {
                                 val p1 = queue[i]
                                 for (j in i + 1 until queue.size) {
                                     val p2 = queue[j]
-                                    if (p1.lastPlayerId != p2.id && p2.lastPlayerId != p1.id) {
+                                    if (p1.lastOpponentId != p2.id && p2.lastOpponentId != p1.id) {
                                         pairedPlayers.add(p1 to p2)
                                         break
                                     }
@@ -41,8 +41,8 @@ class MatchMaker {
                             pairedPlayers.forEach { (p1, p2) ->
                                 queue.remove(p1)
                                 queue.remove(p2)
-                                p1.lastPlayerId = p2.id
-                                p2.lastPlayerId = p1.id
+                                p1.lastOpponentId = p2.id
+                                p2.lastOpponentId = p1.id
 
                                 CoroutineScope(Dispatchers.IO).launch {
                                     onPairReady(p1, p2)

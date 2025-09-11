@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
@@ -30,9 +31,8 @@ import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.player.PlayerMessageType
 import pl.umcs.picto3.player.PlayerRepository
 import pl.umcs.picto3.round.InMemoryRound
-import pl.umcs.picto3.session.Session
+import pl.umcs.picto3.round.RoundService
 import pl.umcs.picto3.session.SessionCreatedEvent
-import pl.umcs.picto3.session.SessionService
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrixDto
 import java.util.UUID
@@ -41,18 +41,19 @@ import java.util.concurrent.ConcurrentHashMap
 @Component
 class GameWebSocketHandler(
     private val playerRepository: PlayerRepository,
-    private val sessionService: SessionService,
     private val objectMapper: ObjectMapper,
     private val matchMaker: MatchMaker,
-    private val symbolMapper: SymbolMapper
+    private val symbolMapper: SymbolMapper,
+    private val roundService: RoundService,
 ) : TextWebSocketHandler() {
 
     private val logger = KotlinLogging.logger {}
-    private val games: MutableMap<String, InMemoryGameDto> = ConcurrentHashMap()
+    private val games: MutableMap<String, InMemoryGame> =
+        ConcurrentHashMap() //TODO nieironicznie tutaj redisa powinnismy uzyc
 
     @EventListener
     fun handleSessionCreated(event: SessionCreatedEvent) {
-        games.put(event.accessCode, InMemoryGameDto(gameConfig = event.gameConfig))
+        games.put(event.accessCode, InMemoryGame(gameConfig = event.gameConfig))
     }
 
     @EventListener
@@ -60,9 +61,11 @@ class GameWebSocketHandler(
         matchMaker.isGameGoing = true
         logger.info { "🚀 Starting game session [${event.accessCode}]" }
         CoroutineScope(Dispatchers.IO).launch {
-            games[event.accessCode]?.webSocketSessions?.let {
+            val players = games[event.accessCode]?.presentPlayers?.values
+            val webSocketSessions = players?.map { it.wsSession }?.toMutableSet() ?: mutableSetOf()
+            if (webSocketSessions.isNotEmpty()) {
                 sendToMultipleSessions(
-                    it,
+                    webSocketSessions,
                     GameMessage.GAME_STARTED.type,
                     mapOf(
                         "message" to "Game has started"
@@ -76,7 +79,7 @@ class GameWebSocketHandler(
     @PostConstruct
     fun initMatchMaker() {
         matchMaker.onPairReady = { p1, p2 ->
-            val game = games[p2.wsSession.getAccessCode()!!]
+            val game = games[p2.sessionAccessCode]
             val randomImages =
                 game?.gameConfig?.images?.shuffled()?.take(game.gameConfig.speakerImageCount.toInt())
                     ?.mapNotNull { it.id }?.toSet() ?: emptySet()
@@ -85,13 +88,17 @@ class GameWebSocketHandler(
             game?.gameRounds?.put(
                 newRoundId,
                 InMemoryRound(
-                    p2.wsSession.getAccessCode()!!,
+                    p2.sessionAccessCode,
                     p1.id!!,
                     p2.id!!,
                     randomImages,
                     topicImageId
                 )
             )
+            p1.lastOpponentId = p2.id //let's refactor this to separate function
+            p2.lastOpponentId = p1.id
+            games[p2.sessionAccessCode]?.presentPlayers?.put(p1.id!!, p1)
+            games[p2.sessionAccessCode]?.presentPlayers?.put(p2.id!!, p2)
             startRoundForSpeaker(
                 p2.wsSession,
                 randomImages,
@@ -123,21 +130,11 @@ class GameWebSocketHandler(
         val role = variables["role"]
             ?: throw Exception("Missing role")
         wsSession.setAccessCode(accessCode)
-        if (sessionService.sessionExists(accessCode)) {
-            val activeSession = sessionService.getSession(accessCode)
+        if (games.containsKey(accessCode)) {
             when (role) {
                 "player" -> {
-                    autoJoinAsPlayer(wsSession, activeSession)
-                }
-
-                "admin" -> {
-                    val apiKey = uri.query?.split("&")
-                        ?.find { it.startsWith("apikey=") }
-                        ?.substringAfter("=")
-                        ?: throw Exception("Missing apikey parameter for admin role")
-
-                    autoJoinAsAdmin(wsSession, activeSession, apiKey)
-                }
+                    autoJoinAsPlayer(wsSession, accessCode)
+                } //TODO dorobienie wywyolania ze gracz wraca go gry musi podac swoj id w pathie
 
                 else -> throw Exception("Unknown role: $role.")
             }
@@ -146,52 +143,32 @@ class GameWebSocketHandler(
         }
     }
 
-    private fun autoJoinAsPlayer(wsSession: WebSocketSession, gameSession: Session) {
-        logger.info { "➡️ Player tries to join to game [${gameSession.accessCode}]" }
+    private fun autoJoinAsPlayer(wsSession: WebSocketSession, gameSessionAccessCode: String) {
+        logger.info { "➡️ Player tries to join to game [${gameSessionAccessCode}]" }
 
-        val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSession.accessCode, wsSession = wsSession))
-        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$gameSession.accessCode]" }
-        sessionService.addPlayerToSession(newPlayer, gameSession.accessCode)
+        val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSessionAccessCode, wsSession = wsSession))
+        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$gameSessionAccessCode.accessCode]" }
         wsSession.setPlayerId(newPlayer.id!!)
         matchMaker.addPlayerToQueue(newPlayer)
         CoroutineScope(Dispatchers.IO).launch {
-            games[gameSession.accessCode]?.webSocketSessions?.let {
+            val players = games[gameSessionAccessCode]?.presentPlayers?.values
+            val webSocketSessions = players?.map { it.wsSession }?.toMutableSet() ?: mutableSetOf()
+            if (webSocketSessions.isNotEmpty()) {
                 sendToMultipleSessions(
-                    it,
-                    GameMessage.PLAYER_JOINED.type,
+                    webSocketSessions,
+                    GameMessage.GAME_STARTED.type,
                     mapOf(
-                        "newPlayerJoined" to "New player just joined session",
+                        "message" to "Game has started"
+                    )
+                )
+                sendToSession(
+                    wsSession,
+                    GameMessage.PLAYER_WELCOME.type,
+                    mapOf(
+                        "playerWelcomeMessage" to "Welcome to picto game!",
                     )
                 )
             }
-            sendToSession(
-                wsSession,
-                GameMessage.PLAYER_WELCOME.type,
-                mapOf(
-                    "playerWelcomeMessage" to "Welcome to picto game!",
-                )
-            )
-        }
-    }
-
-    private fun autoJoinAsAdmin(wsSession: WebSocketSession, gameSession: Session, adminApiKey: String) {
-        logger.info { "👑 Admin tries to join to game [${gameSession.accessCode}]" }
-
-        if (gameSession.adminApiKey != adminApiKey) {
-            throw Exception("Wrong admin token!")
-        }
-        gameSession.adminsWsSessions.add(wsSession.id)
-
-        logger.info { "✅ Admin connected to game [${gameSession.accessCode}]" }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            sendToSession(
-                wsSession,
-                GameMessage.ADMIN_CONNECTED.type,
-                mapOf(
-                    "adminWelcomeMessage" to "Welcome admin to picto game!",
-                )
-            )
         }
     }
 
@@ -201,8 +178,9 @@ class GameWebSocketHandler(
             when (messageWrapper.type) {
                 PlayerMessageType.LISTENER_IMAGE_PICKED.type -> {
                     val data = objectMapper.convertValue(messageWrapper.data, ListenerImagePickedData::class.java)
-                    handleListenerPick(wsSession.getAccessCode()!!, wsSession.getRoundId()!!, data)
-
+                    handleListenerPick(
+                        wsSession.getAccessCode()!!, wsSession.getPlayerId(), data
+                    )
                 }
 
                 PlayerMessageType.SPEAKER_SYMBOLS_PICKED.type -> {
@@ -253,7 +231,7 @@ class GameWebSocketHandler(
             return
         }
 
-        val pickedSymbolsCount = data.symbols.size
+        val pickedSymbolsCount = data.symbolsIds.size
         val requiredCount = game.gameConfig.speakerImageCount.toInt()
 
         when {
@@ -266,7 +244,7 @@ class GameWebSocketHandler(
             }
 
             else -> {
-                val symbolUUIDs = data.symbols.map { UUID.fromString(it) }
+                val symbolUUIDs = data.symbolsIds
                 val updatedRound = round.copy(
                     speakerPickedSymbolsIds = symbolUUIDs,
                     speakerResponseTime = data.speakerResponseTime
@@ -277,7 +255,7 @@ class GameWebSocketHandler(
     }
 
     private fun startRoundForSpeaker(
-        wsSession: WebSocketSession,
+        wsSession: WebSocketSession?,
         randomImages: Set<UUID>,
         topicImageId: UUID,
         symbolMatrix: SymbolMatrixDto,
@@ -297,15 +275,17 @@ class GameWebSocketHandler(
         }
     }
 
-    private fun startRoundForListener(wsSession: WebSocketSession) {
-        CoroutineScope(Dispatchers.IO).launch {
-            sendToSession(
-                wsSession,
-                GameMessage.LISTENER_STAGE_1.type,
-                mapOf(
-                    "info" to "Speaker is picking question",
+    private fun startRoundForListener(wsSession: WebSocketSession?) {
+        wsSession?.let { session ->
+            CoroutineScope(Dispatchers.IO).launch {
+                sendToSession(
+                    session,
+                    GameMessage.LISTENER_STAGE_1.type,
+                    mapOf(
+                        "info" to "Speaker is picking question",
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -329,7 +309,7 @@ class GameWebSocketHandler(
             listenerResponseTime = data.listenerResponseTime,
         )
         game.gameRounds[roundId] = updatedRound
-        // jeszcze zaznaczenie ze oni grali teraz razem i dodanie ich do puli
+        endRound(accessCode, roundId)
 //        1.tutaj funkcja ktora wysle z opoznieniem graczy znowu do puli
 //        2.pozniej nastepuje zapis rundy do bazy w osobnym threadzie
 //        3.na sam koniec gracze dostaja odpowiedz czy ich odpowiedz sie zgadzala czy nie
@@ -337,21 +317,22 @@ class GameWebSocketHandler(
     }
 
     override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
-        games[wsSession.getAccessCode()]?.webSocketSessions?.removeIf { it.id == wsSession.id }
-        val playerToRemove = playerRepository.getReferenceById(wsSession.getPlayerId()!!)
-        matchMaker.removePlayerFromQueue(playerToRemove)
+        games[wsSession.getAccessCode()]?.presentPlayers[wsSession.getPlayerId()]?.let {
+            it.wsSession = null
+            matchMaker.removePlayerFromQueue(it)
+        }
         logger.info { "⬅️ Player disconnected from game [${wsSession.getAccessCode()}]" }
     }
 
     private suspend fun sendToMultipleSessions(
-        sessions: MutableSet<WebSocketSession>,
+        sessions: Set<WebSocketSession?>,
         type: String,
         data: Map<String, Any>
     ) {
         val message = createJsonMessage(type, data)
 
         coroutineScope {
-            sessions.map { session ->
+            sessions.filterNotNull().map { session ->
                 async(Dispatchers.IO) {
                     if (session.isOpen) {
                         try {
@@ -368,15 +349,17 @@ class GameWebSocketHandler(
         logger.debug { "📤 Broadcast to ${sessions.size} $type" }
     }
 
-    private suspend fun sendToSession(session: WebSocketSession, type: String, data: Map<String, Any>) {
-        withContext(Dispatchers.IO) {
-            if (session.isOpen) {
-                try {
-                    val message = createJsonMessage(type, data)
-                    session.sendMessage(TextMessage(message))
-                    logger.debug { "📤 Sent to ${session.id}: $type" }
-                } catch (e: Exception) {
-                    logger.error(e) { "❌ Error sending msg to ${session.id}" }
+    private suspend fun sendToSession(session: WebSocketSession?, type: String, data: Map<String, Any>) {
+        session?.let {
+            withContext(Dispatchers.IO) {
+                if (it.isOpen) {
+                    try {
+                        val message = createJsonMessage(type, data)
+                        it.sendMessage(TextMessage(message))
+                        logger.debug { "📤 Sent to ${it.id}: $type" }
+                    } catch (e: Exception) {
+                        logger.error(e) { "❌ Error sending msg to ${it.id}" }
+                    }
                 }
             }
         }
@@ -390,5 +373,61 @@ class GameWebSocketHandler(
                 "timestamp" to System.currentTimeMillis()
             )
         )
+    }
+
+    private fun endRound(accessCode: String, roundId: UUID) {
+        val game = games[accessCode] ?: return
+        val round = game.gameRounds[roundId] ?: return
+        sendResultToPlayers(game, round)
+        saveRoundResult(round)
+        val endedRoundPlayers = setOf(
+            game.presentPlayers[round.speakerId],
+            game.presentPlayers[round.listenerId]
+        )
+        movePlayersToMatchMaker(endedRoundPlayers)
+
+    }
+
+    private fun sendResultToPlayers(game: InMemoryGame, round: InMemoryRound) {
+
+        val wsSessionsToSendResult = setOf(
+            game.presentPlayers[round.listenerId]?.wsSession,
+            game.presentPlayers[round.speakerId]?.wsSession
+        )
+        val roundResult = if (round.topicImageId == round.listenerPickedImageId) {
+            mapOf(
+                "roundResult" to "Correct",
+                "receivedPoints" to "10" //TODO podmianka na wartosci z game configa
+            )
+        } else {
+            mapOf(
+                "roundResult" to "Wrong",
+                "receivedPoints" to "10" //TODO podmianka na wartosci z game configa
+            )
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToMultipleSessions(
+                wsSessionsToSendResult,
+                GameMessage.ROUND_RESULT.type,
+                roundResult
+            )
+        }
+    }
+
+    private fun movePlayersToMatchMaker(
+        playersToMoveBack: Set<Player?>,
+        delaySeconds: Long = 5
+    ) { //TODO podmianka na wartosc z configa
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(delaySeconds * 1000)
+            playersToMoveBack.filterNotNull().forEach { player ->
+                matchMaker.addPlayerToQueue(player)
+            }
+            logger.debug { "Players moved back to matchmaker after ${delaySeconds}s delay" }
+        }
+    }
+
+    private fun saveRoundResult(round: InMemoryRound) {
+        roundService.saveNewRound(round)
     }
 }
