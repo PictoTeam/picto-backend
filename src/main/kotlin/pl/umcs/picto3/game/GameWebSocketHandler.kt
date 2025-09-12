@@ -182,7 +182,7 @@ class GameWebSocketHandler(
         logger.info { "➡️ Player tries to join to game [${gameSessionAccessCode}]" }
 
         val newPlayer = playerRepository.save(Player(sessionAccessCode = gameSessionAccessCode, wsSession = wsSession))
-        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$gameSessionAccessCode.accessCode]" }
+        logger.debug { "Player '${newPlayer.id}' joined session with accessCode: [$gameSessionAccessCode]" }
         wsSession.setPlayerId(newPlayer.id!!)
         matchMaker.addPlayerToQueue(newPlayer)
         CoroutineScope(Dispatchers.IO).launch {
@@ -191,7 +191,7 @@ class GameWebSocketHandler(
             if (webSocketSessions.isNotEmpty()) {
                 sendToMultipleSessions(
                     webSocketSessions,
-                    GameMessage.GAME_STARTED.type,
+                    GameMessage.PLAYER_JOINED.type,
                     mapOf(
                         "message" to "Game has started"
                     )
