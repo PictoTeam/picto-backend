@@ -32,9 +32,11 @@ import pl.umcs.picto3.player.PlayerMessageType
 import pl.umcs.picto3.player.PlayerRepository
 import pl.umcs.picto3.round.InMemoryRound
 import pl.umcs.picto3.round.RoundService
+import pl.umcs.picto3.session.SessionClosedEvent
 import pl.umcs.picto3.session.SessionCreatedEvent
 import pl.umcs.picto3.symbol.SymbolMapper
 import pl.umcs.picto3.symbol.SymbolMatrixDto
+import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -48,20 +50,20 @@ class GameWebSocketHandler(
 ) : TextWebSocketHandler() {
 
     private val logger = KotlinLogging.logger {}
-    private val games: MutableMap<String, InMemoryGame> =
+    private val sessions: MutableMap<String, InMemoryGame> =
         ConcurrentHashMap() //TODO nieironicznie tutaj redisa powinnismy uzyc
 
     @EventListener
     fun handleSessionCreated(event: SessionCreatedEvent) {
-        games.put(event.accessCode, InMemoryGame(gameConfig = event.gameConfig))
+        sessions.put(event.accessCode, InMemoryGame(gameConfig = event.gameConfig))
     }
 
     @EventListener
     fun handleGameStarted(event: GameStartedEvent) {
         matchMaker.isGameGoing = true
-        logger.info { "🚀 Starting game session [${event.accessCode}]" }
+        logger.info { "🚀 Starting game [${event.accessCode}]" }
         CoroutineScope(Dispatchers.IO).launch {
-            val players = games[event.accessCode]?.presentPlayers?.values
+            val players = sessions[event.accessCode]?.presentPlayers?.values
             val webSocketSessions = players?.map { it.wsSession }?.toMutableSet() ?: mutableSetOf()
             if (webSocketSessions.isNotEmpty()) {
                 sendToMultipleSessions(
@@ -76,10 +78,41 @@ class GameWebSocketHandler(
         logger.info { "✅ Game [${event.accessCode}] has started" }
     }
 
+    @EventListener
+    fun handleGameFinished(event: GameFinishedEvent) {
+        matchMaker.isGameGoing = false
+        logger.info { "🛑 Finishing game [${event.accessCode}]" }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val game = sessions[event.accessCode] ?: return@launch
+            val gameConfig = game.gameConfig
+
+            val timeToFinishRounds = (gameConfig.speakerAnswerTime + gameConfig.listenerAnswerTime) * 1000L
+            delay(timeToFinishRounds)
+
+            val playerSessions = game.presentPlayers.values.mapNotNull { it.wsSession }.toSet()
+
+            sendToMultipleSessions(
+                playerSessions,
+                GameMessage.GAME_FINISHED.type,
+                mapOf(
+                    "message" to "Game has finished"
+                )
+            )
+            logger.debug { "Players notified of game finish after ${timeToFinishRounds / 1000}s delay" }
+            saveAllGameRounds(event.gameId)
+        }
+    }
+
+    @EventListener
+    fun handleSessionClosed(event: SessionClosedEvent) {
+        sessions.remove(event.accessCode)
+    }
+
     @PostConstruct
     fun initMatchMaker() {
         matchMaker.onPairReady = { p1, p2 ->
-            val game = games[p2.sessionAccessCode]
+            val game = sessions[p2.sessionAccessCode]
             val randomImages =
                 game?.gameConfig?.images?.shuffled()?.take(game.gameConfig.speakerImageCount.toInt())
                     ?.mapNotNull { it.id }?.toSet() ?: emptySet()
@@ -92,13 +125,14 @@ class GameWebSocketHandler(
                     p1.id!!,
                     p2.id!!,
                     randomImages,
-                    topicImageId
+                    topicImageId,
+                    startedAt = LocalDateTime.now(),
                 )
             )
             p1.lastOpponentId = p2.id //let's refactor this to separate function
             p2.lastOpponentId = p1.id
-            games[p2.sessionAccessCode]?.presentPlayers?.put(p1.id!!, p1)
-            games[p2.sessionAccessCode]?.presentPlayers?.put(p2.id!!, p2)
+            sessions[p2.sessionAccessCode]?.presentPlayers?.put(p1.id!!, p1)
+            sessions[p2.sessionAccessCode]?.presentPlayers?.put(p2.id!!, p2)
             startRoundForSpeaker(
                 p2.wsSession,
                 randomImages,
@@ -130,11 +164,12 @@ class GameWebSocketHandler(
         val role = variables["role"]
             ?: throw Exception("Missing role")
         wsSession.setAccessCode(accessCode)
-        if (games.containsKey(accessCode)) {
+        if (sessions.containsKey(accessCode)) {
             when (role) {
                 "player" -> {
                     autoJoinAsPlayer(wsSession, accessCode)
                 } //TODO dorobienie wywyolania ze gracz wraca go gry musi podac swoj id w pathie
+//                TLDR: szukasz po id gracza z session players i podmieniasz adres websocketa + dodaje do puli
 
                 else -> throw Exception("Unknown role: $role.")
             }
@@ -151,7 +186,7 @@ class GameWebSocketHandler(
         wsSession.setPlayerId(newPlayer.id!!)
         matchMaker.addPlayerToQueue(newPlayer)
         CoroutineScope(Dispatchers.IO).launch {
-            val players = games[gameSessionAccessCode]?.presentPlayers?.values
+            val players = sessions[gameSessionAccessCode]?.presentPlayers?.values
             val webSocketSessions = players?.map { it.wsSession }?.toMutableSet() ?: mutableSetOf()
             if (webSocketSessions.isNotEmpty()) {
                 sendToMultipleSessions(
@@ -221,7 +256,7 @@ class GameWebSocketHandler(
             return
         }
 
-        val game = games[accessCode] ?: run {
+        val game = sessions[accessCode] ?: run {
             logger.warn { "Game not found for access code: $accessCode" }
             return
         }
@@ -295,7 +330,7 @@ class GameWebSocketHandler(
             return
         }
 
-        val game = games[accessCode] ?: run {
+        val game = sessions[accessCode] ?: run {
             logger.warn { "Game not found for access code: $accessCode" }
             return
         }
@@ -310,14 +345,10 @@ class GameWebSocketHandler(
         )
         game.gameRounds[roundId] = updatedRound
         endRound(accessCode, roundId)
-//        1.tutaj funkcja ktora wysle z opoznieniem graczy znowu do puli
-//        2.pozniej nastepuje zapis rundy do bazy w osobnym threadzie
-//        3.na sam koniec gracze dostaja odpowiedz czy ich odpowiedz sie zgadzala czy nie
-
     }
 
     override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
-        games[wsSession.getAccessCode()]?.presentPlayers[wsSession.getPlayerId()]?.let {
+        sessions[wsSession.getAccessCode()]?.presentPlayers[wsSession.getPlayerId()]?.let {
             it.wsSession = null
             matchMaker.removePlayerFromQueue(it)
         }
@@ -376,7 +407,7 @@ class GameWebSocketHandler(
     }
 
     private fun endRound(accessCode: String, roundId: UUID) {
-        val game = games[accessCode] ?: return
+        val game = sessions[accessCode] ?: return
         val round = game.gameRounds[roundId] ?: return
         sendResultToPlayers(game, round)
         saveRoundResult(round)
@@ -429,5 +460,9 @@ class GameWebSocketHandler(
 
     private fun saveRoundResult(round: InMemoryRound) {
         roundService.saveNewRound(round)
+    }
+
+    private fun saveAllGameRounds(accessCode: UUID) {
+        roundService.saveAllGameRounds(accessCode)
     }
 }

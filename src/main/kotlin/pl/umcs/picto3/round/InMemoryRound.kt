@@ -1,6 +1,6 @@
 package pl.umcs.picto3.round
 
-
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class InMemoryRound(
@@ -12,5 +12,7 @@ data class InMemoryRound(
     val speakerPickedSymbolsIds: List<UUID> = mutableListOf(),
     val speakerResponseTime: Int? = null,
     val listenerPickedImageId: UUID? = null,
-    val listenerResponseTime: Int? = null
+    val listenerResponseTime: Int? = null,
+    val startedAt: LocalDateTime? = null,
+    val endedAt: LocalDateTime? = null,
 )

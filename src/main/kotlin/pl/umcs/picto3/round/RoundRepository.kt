@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface RoundRepository : JpaRepository<Round, UUID>
+interface RoundRepository : JpaRepository<Round, UUID> {
+    fun findAllByGameId(gameId: UUID): List<Round>
+}

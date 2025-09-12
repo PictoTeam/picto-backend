@@ -17,5 +17,6 @@ enum class GameMessage(val type: String) {
 
     ROUND_RESULT("ROUND_RESULT"),
     GAME_STARTED("GAME_STARTED"),
+    GAME_FINISHED("GAME_FINISHED"),
     ERROR("ERROR"),
 }
