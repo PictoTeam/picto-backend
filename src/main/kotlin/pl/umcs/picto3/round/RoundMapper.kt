@@ -1,6 +1,7 @@
 package pl.umcs.picto3.round
 
 import org.springframework.stereotype.Component
+import pl.umcs.picto3.game.GameRepository
 import pl.umcs.picto3.image.ImageRepository
 import pl.umcs.picto3.player.PlayerRepository
 import pl.umcs.picto3.session.SessionRepository
@@ -14,6 +15,7 @@ class RoundMapper(
     private val imageRepository: ImageRepository,
     private val symbolRepository: SymbolRepository,
     private val roundRepository: RoundRepository,
+    private val gameRepository: GameRepository,
 ) {
     fun toEntity(dto: InMemoryRound): Round {
         //TODO moze da sie jakos ladniej tego mappera zrobic ?
@@ -35,8 +37,11 @@ class RoundMapper(
 
         val selectedSymbols = symbolRepository.findAllById(dto.speakerPickedSymbolsIds)
 
+        val game = gameRepository.findById(session.gameId!!)
+            .orElseThrow { IllegalArgumentException("Game not found: ${session.gameId}") }
+
         val newRound = Round(
-            gameId = session.gameId!!,
+            game = game,
             listener = listener,
             speaker = speaker,
             topic = topic,

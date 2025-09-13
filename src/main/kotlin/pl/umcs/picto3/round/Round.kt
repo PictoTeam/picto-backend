@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import lombok.Builder
+import pl.umcs.picto3.game.Game
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.Symbol
@@ -26,8 +27,9 @@ data class Round(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
-    @Column(name = "game_id")
-    val gameId: UUID,
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    val game: Game,
 
     @ManyToOne
     @JoinColumn(name = "listener_id")

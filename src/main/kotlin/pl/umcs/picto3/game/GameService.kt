@@ -8,14 +8,14 @@ import pl.umcs.picto3.symbol.SymbolMatrix
 class GameService(private val gameRepository: GameRepository) {
 
     fun getRandomImages(sessionAccessCode: String): List<Image> {
-        val currentGame = gameRepository.getGameById(sessionAccessCode)
+        val currentGame = gameRepository.getGameBySessionAccessCode(sessionAccessCode)
         return currentGame.gameConfig.images
             .shuffled()
             .take(currentGame.gameConfig.speakerImageCount.toInt())
     }
 
     fun getSymbolsForGame(sessionAccessCode: String): SymbolMatrix {
-        val currentGame = gameRepository.getGameById(sessionAccessCode)
+        val currentGame = gameRepository.getGameBySessionAccessCode(sessionAccessCode)
         return currentGame.gameConfig.symbols
     }
 }
