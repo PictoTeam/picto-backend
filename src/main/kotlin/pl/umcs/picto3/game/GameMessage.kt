@@ -6,9 +6,17 @@ enum class GameMessage(val type: String) {
     PLAYER_WELCOME("PLAYER_WELCOME"),
     PLAYER_LEFT("PLAYER_LEFT"),
 
+    SPEAKER_STAGE_1("SPEAKER_STAGE_1"),
+    SPEAKER_STAGE_2("SPEAKER_STAGE_2"),
+
+    LISTENER_STAGE_1("LISTENER_STAGE_1"),
+    LISTENER_STAGE_2("LISTENER_STAGE_2"), //TODO weryfikacja bo gdzies stage musialem pomylic
+
     // Admin events
     ADMIN_CONNECTED("ADMIN_CONNECTED"),
 
+    ROUND_RESULT("ROUND_RESULT"),
     GAME_STARTED("GAME_STARTED"),
+    GAME_FINISHED("GAME_FINISHED"),
     ERROR("ERROR"),
 }

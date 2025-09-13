@@ -15,7 +15,6 @@ import pl.umcs.picto3.symbol.SymbolPlacement
 import pl.umcs.picto3.symbol.SymbolPlacementRepository
 import pl.umcs.picto3.symbol.Symbol
 import pl.umcs.picto3.symbol.SymbolRepository
-import java.util.UUID
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -62,7 +61,7 @@ class GameConfigRepositoryIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = setOf(savedSymbolPlacement)
+            symbolPlacements = listOf(savedSymbolPlacement)
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 
@@ -131,7 +130,7 @@ class GameConfigRepositoryIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 
@@ -187,7 +186,7 @@ class GameConfigRepositoryIntegrationTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         val savedSymbolMatrix = symbolMatrixRepository.save(symbolMatrix)
 

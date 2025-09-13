@@ -39,6 +39,5 @@ logging:
             sql:
               BasicBinder: TRACE
 
-admin:
-  game:
-    api-key: ${ADMIN_KEY}
+matchmaker:
+  frequency: 5000

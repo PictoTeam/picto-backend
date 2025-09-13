@@ -26,7 +26,7 @@ class SymbolMapper(
 
     fun toSymbolMatrix(dto: SymbolMatrixConfigDto): SymbolMatrix {
         val mappedSymbolPlacements = dto.symbolPlacements
-            .map { placementDto -> toSymbolPlacement(placementDto) }.toSet()
+            .map { placementDto -> toSymbolPlacement(placementDto) }.toList()
 
         return SymbolMatrix(
             id = null,

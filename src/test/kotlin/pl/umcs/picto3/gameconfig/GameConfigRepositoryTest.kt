@@ -25,7 +25,7 @@ class GameConfigRepositoryTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         entityManager.persist(symbolMatrix)
         
@@ -86,7 +86,7 @@ class GameConfigRepositoryTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         entityManager.persist(symbolMatrix1)
         
@@ -94,7 +94,7 @@ class GameConfigRepositoryTest {
             id = null,
             rowSize = 4.toShort(),
             columnSize = 4.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         entityManager.persist(symbolMatrix2)
         
@@ -148,7 +148,7 @@ class GameConfigRepositoryTest {
             id = null,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         entityManager.persist(symbolMatrix)
         

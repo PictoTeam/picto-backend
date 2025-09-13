@@ -43,7 +43,7 @@ class SymbolService(
                 id = null,
                 rowSize = symbolMatrixConfigDto.rowSize,
                 columnSize = symbolMatrixConfigDto.columnSize,
-                symbolPlacements = symbolPlacements
+                symbolPlacements = symbolPlacements.toList()
             )
         )
     }

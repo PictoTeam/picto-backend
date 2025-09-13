@@ -92,7 +92,7 @@ class GameConfigDtoTest {
             id = testSymbolMatrixId,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         
         val images = setOf(
@@ -124,7 +124,7 @@ class GameConfigDtoTest {
             id = testSymbolMatrixId,
             rowSize = 3.toShort(),
             columnSize = 3.toShort(),
-            symbolPlacements = emptySet()
+            symbolPlacements = emptyList()
         )
         
         val images = setOf(

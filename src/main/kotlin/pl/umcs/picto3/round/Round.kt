@@ -1,15 +1,26 @@
 package pl.umcs.picto3.round
 
-import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
+import lombok.Builder
 import pl.umcs.picto3.game.Game
 import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.symbol.Symbol
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
+
 
 @Entity
+@Builder
 @Table(name = "rounds")
 data class Round(
     @Id
@@ -21,9 +32,11 @@ data class Round(
     val game: Game,
 
     @ManyToOne
+    @JoinColumn(name = "listener_id")
     val listener: Player,
 
     @ManyToOne
+    @JoinColumn(name = "speaker_id")
     val speaker: Player,
 
     @ManyToOne
@@ -35,7 +48,8 @@ data class Round(
     val selectedImage: Image?,
 
     @OneToMany
-    val selectedSymbols: List<Symbol> = emptyList(),
+    @JoinColumn(name = "round_id")
+    val selectedSymbols: List<Symbol>,
 
     @Column(name = "speaker_response_time_ms")
     val speakerResponseTime: Int?,
@@ -43,7 +57,6 @@ data class Round(
     @Column(name = "listener_response_time_ms")
     val listenerResponseTime: Int?,
 
-    @CreationTimestamp
     @Column(name = "started_at")
     val startedAt: LocalDateTime,
 
