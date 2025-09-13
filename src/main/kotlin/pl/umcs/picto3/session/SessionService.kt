@@ -30,16 +30,12 @@ class SessionService(
 
 
     fun startGameInSessionWithGivenAccessCode(accessCode: String) {
-        if (gameRepository.existsBySessionAccessCode(accessCode)) {
-            val sessionToStartGame = sessionRepository.findById(accessCode).orElseThrow {
-                IllegalArgumentException("Session with code: $accessCode not found")
-            }
-            val newGame = Game(gameConfig = sessionToStartGame.gameConfig, sessionAccessCode = accessCode)
-            gameRepository.save(newGame)
-            applicationEventPublisher.publishEvent(GameStartedEvent(accessCode, newGame.id!!))
-        } else {
-            throw IllegalArgumentException("Game with accessCode $accessCode not found")
+        val sessionToStartGame = sessionRepository.findById(accessCode).orElseThrow {
+            IllegalArgumentException("Session with code: $accessCode not found")
         }
+        val newGame = Game(gameConfig = sessionToStartGame.gameConfig, sessionAccessCode = accessCode)
+        gameRepository.save(newGame)
+        applicationEventPublisher.publishEvent(GameStartedEvent(accessCode, newGame.id!!))
     }
 
     fun finishGameInSessionWithGivenAccessCode(accessCode: String) {
