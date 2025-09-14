@@ -19,6 +19,7 @@ data class SymbolPlacementDto(
     val rowIndex: Short,
     val columnIndex: Short,
     val symbolPath: String,
+    val symbolId: UUID
 )
 
 data class SymbolMatrixDto(

@@ -19,7 +19,8 @@ class SymbolMapper(
         return SymbolPlacementDto(
             entity.rowIndex,
             entity.columnIndex,
-            "/static/symbols/" + entity.symbol.storedFileName
+            "/static/symbols/" + entity.symbol.storedFileName,
+            symbolId = entity.symbol.id!!
         )
     }
 
