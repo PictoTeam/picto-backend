@@ -6,7 +6,9 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToMany
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.util.UUID
 
@@ -24,6 +26,7 @@ data class SymbolMatrix(
     @Column(name = "column_size")
     val columnSize: Short,
 
-    @ManyToMany
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "symbol_matrix_id")
     val symbolPlacements: List<SymbolPlacement>
 )
