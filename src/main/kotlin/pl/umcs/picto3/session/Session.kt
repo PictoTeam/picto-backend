@@ -1,14 +1,26 @@
 package pl.umcs.picto3.session
 
 
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
 import pl.umcs.picto3.gameconfig.GameConfig
-import pl.umcs.picto3.player.Player
-import java.util.concurrent.ConcurrentHashMap
+import java.util.UUID
 
+@Entity
+@Table(name = "sessions")
 data class Session(
-    val gameConfig: GameConfig,
+    @Id
+    @Column(name = "id")
     val accessCode: String,
-    val activeMembers: MutableSet<Player> = ConcurrentHashMap.newKeySet(),
-    val adminsWsSessions: MutableSet<String> = ConcurrentHashMap.newKeySet(),
-    val adminApiKey: String
+
+    @Column(name = "game_id")
+    val gameId: UUID? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "game_config_id")
+    val gameConfig: GameConfig,
 )

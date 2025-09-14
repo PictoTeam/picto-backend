@@ -1,3 +1,8 @@
 package pl.umcs.picto3.session
 
-data class SessionCreatedEvent(val accessCode: String)
+import pl.umcs.picto3.gameconfig.GameConfig
+
+data class SessionCreatedEvent(
+    val accessCode: String,
+    val gameConfig: GameConfig
+)

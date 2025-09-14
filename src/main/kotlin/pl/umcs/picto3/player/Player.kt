@@ -1,9 +1,14 @@
 package pl.umcs.picto3.player
 
 
-import jakarta.persistence.*
-import pl.umcs.picto3.round.Round
-import java.util.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import org.springframework.web.socket.WebSocketSession
+import java.util.UUID
+
 
 @Entity
 @Table(name = "players")
@@ -12,10 +17,13 @@ data class Player(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
-    @OneToMany
-    val rounds: MutableList<Round> = mutableListOf(),
+    @Transient
+    var wsSession: WebSocketSession? = null,
 
     @Transient
-    val sessionAccessCode: String
+    val sessionAccessCode: String,
+
+    @Transient
+    var lastOpponentId: UUID? = null
 
 )

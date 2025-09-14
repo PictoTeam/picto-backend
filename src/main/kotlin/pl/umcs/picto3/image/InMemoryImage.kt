@@ -2,9 +2,7 @@ package pl.umcs.picto3.image
 
 import java.util.UUID
 
-
-data class ImageDto(
-    val imagePath: String,
+data class InMemoryImage(
     val imageId: UUID,
-    val isTopic: Boolean,
+    val imagePath: String,
 )

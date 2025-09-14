@@ -248,4 +248,66 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="013-add-missing-columns-to-game-configs" author="picto-dev">
+        <addColumn tableName="game_configs">
+            <column name="speaker_answer_time_ms" type="INTEGER" defaultValue="-1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="game_configs">
+            <column name="listener_answer_time_ms" type="INTEGER" defaultValue="-1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="game_configs">
+            <column name="wrong_answer_points" type="SMALLINT" defaultValue="-1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="game_configs">
+            <column name="result_screen_time_ms" type="INTEGER" defaultValue="3000">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="game_configs">
+            <column name="correct_answer_points" type="SMALLINT" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="014-add-symbol-matrix-id-to-symbol-placements" author="picto-dev">
+        <addColumn tableName="symbol_placements">
+            <column name="symbol_matrix_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseTableName="symbol_placements"
+                baseColumnNames="symbol_matrix_id"
+                constraintName="fk_symbol_placements_symbol_matrix"
+                referencedTableName="symbol_matrices"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="015-add-round-id-to-symbols" author="picto-dev">
+        <addColumn tableName="symbols">
+            <column name="round_id" type="UUID">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseTableName="symbols"
+                baseColumnNames="round_id"
+                constraintName="fk_symbols_round"
+                referencedTableName="rounds"
+                referencedColumnNames="id"/>
+    </changeSet>
+
 </databaseChangeLog>

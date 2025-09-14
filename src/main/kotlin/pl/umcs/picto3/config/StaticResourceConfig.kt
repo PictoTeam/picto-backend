@@ -7,7 +7,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class StaticResourceConfig : WebMvcConfigurer {
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry.addResourceHandler("/static/**")
-            .addResourceLocations("classpath:/static/")
+        registry.addResourceHandler("/images/**")
+            .addResourceLocations("file:src/main/resources/static/images/")
+            .setCachePeriod(1800)
+
+        registry.addResourceHandler("/symbols/**")
+            .addResourceLocations("file:src/main/resources/static/symbols/")
+            .setCachePeriod(1800)
     }
 }

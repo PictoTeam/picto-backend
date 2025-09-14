@@ -1,6 +1,7 @@
 package pl.umcs.picto3.symbol
 
-import java.util.*
+import java.util.UUID
+
 
 data class SymbolMatrixConfigDto(
     val rowSize: Short,
@@ -18,6 +19,7 @@ data class SymbolPlacementDto(
     val rowIndex: Short,
     val columnIndex: Short,
     val symbolPath: String,
+    val symbolId: UUID
 )
 
 data class SymbolMatrixDto(

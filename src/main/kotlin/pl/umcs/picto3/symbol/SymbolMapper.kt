@@ -19,14 +19,15 @@ class SymbolMapper(
         return SymbolPlacementDto(
             entity.rowIndex,
             entity.columnIndex,
-            "/static/symbols/" + entity.symbol.storedFileName
+            "/static/symbols/" + entity.symbol.storedFileName,
+            symbolId = entity.symbol.id!!
         )
     }
 
 
     fun toSymbolMatrix(dto: SymbolMatrixConfigDto): SymbolMatrix {
         val mappedSymbolPlacements = dto.symbolPlacements
-            .map { placementDto -> toSymbolPlacement(placementDto) }.toSet()
+            .map { placementDto -> toSymbolPlacement(placementDto) }.toList()
 
         return SymbolMatrix(
             id = null,
