@@ -26,6 +26,7 @@ import pl.umcs.picto3.game.communication.getPlayerId
 import pl.umcs.picto3.game.communication.getRoundId
 import pl.umcs.picto3.game.communication.setAccessCode
 import pl.umcs.picto3.game.communication.setPlayerId
+import pl.umcs.picto3.game.communication.setRoundId
 import pl.umcs.picto3.matchmaker.MatchMaker
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.player.PlayerMessageType
@@ -129,8 +130,12 @@ class GameWebSocketHandler(
                     startedAt = LocalDateTime.now(),
                 )
             )
-            p1.lastOpponentId = p2.id //let's refactor this to separate function
+            //setup p1 info
+            p1.lastOpponentId = p2.id
+            p2.wsSession?.setRoundId(newRoundId)
+            //setup p2 info
             p2.lastOpponentId = p1.id
+            p2.wsSession?.setRoundId(newRoundId)
             sessions[p2.sessionAccessCode]?.presentPlayers?.put(p1.id!!, p1)
             sessions[p2.sessionAccessCode]?.presentPlayers?.put(p2.id!!, p2)
             startRoundForSpeaker(
