@@ -243,7 +243,7 @@ class GameWebSocketHandler(
                     wsSession,
                     GameMessage.ERROR.type,
                     mapOf(
-                        "error message" to "Unexpected error occurred!",
+                        "error_message" to "Unexpected error occurred!",
                     )
                 )
             }
