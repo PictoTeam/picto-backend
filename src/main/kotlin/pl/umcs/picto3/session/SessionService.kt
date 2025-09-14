@@ -35,6 +35,8 @@ class SessionService(
         }
         val newGame = Game(gameConfig = sessionToStartGame.gameConfig, sessionAccessCode = accessCode)
         gameRepository.save(newGame)
+        sessionToStartGame.gameId = newGame.id
+        sessionRepository.save(sessionToStartGame)
         applicationEventPublisher.publishEvent(GameStartedEvent(accessCode, newGame.id!!))
     }
 
