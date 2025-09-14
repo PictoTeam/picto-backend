@@ -50,6 +50,7 @@ class StorageService(
         }
     }
 
+    @Transactional(readOnly = true)
     fun getSymbolsForGameWithSessionAccessCode(sessionAccessCode: String): SymbolMatrixDto {
         val symbolsForGame = gameService.getSymbolsForGame(sessionAccessCode)
         return symbolMapper.toSymbolMatrixDto(symbolsForGame)
