@@ -22,7 +22,7 @@ class RoundService(
         val game = gameRepository.findById(gameId)
             .orElseThrow { IllegalArgumentException("Game not found with id: $gameId") }
 
-        game.rounds = rounds
+        game.rounds.addAll(rounds)
         gameRepository.save(game)
     }
 }

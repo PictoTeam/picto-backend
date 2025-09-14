@@ -27,9 +27,8 @@ data class Round(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
-    @ManyToOne
-    @JoinColumn(name = "game_id")
-    val game: Game,
+    @Column(name = "game_id")
+    val gameId: UUID,
 
     @ManyToOne
     @JoinColumn(name = "listener_id")

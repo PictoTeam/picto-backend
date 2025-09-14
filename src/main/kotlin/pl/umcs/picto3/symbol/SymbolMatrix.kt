@@ -24,6 +24,6 @@ data class SymbolMatrix(
     @Column(name = "column_size")
     val columnSize: Short,
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     val symbolPlacements: List<SymbolPlacement>
 )

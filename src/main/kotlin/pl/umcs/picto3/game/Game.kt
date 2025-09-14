@@ -6,6 +6,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
@@ -26,8 +27,9 @@ data class Game(
     @ManyToOne
     val gameConfig: GameConfig,
 
-    @OneToMany(mappedBy = "game")
-    var rounds: List<Round>? = null,
+    @OneToMany
+    @JoinColumn(name = "game_id")
+    val rounds: MutableList<Round> = mutableListOf(),
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

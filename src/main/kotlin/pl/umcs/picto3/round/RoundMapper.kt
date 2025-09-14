@@ -14,11 +14,9 @@ class RoundMapper(
     private val playerRepository: PlayerRepository,
     private val imageRepository: ImageRepository,
     private val symbolRepository: SymbolRepository,
-    private val roundRepository: RoundRepository,
-    private val gameRepository: GameRepository,
+    private val roundRepository: RoundRepository
 ) {
     fun toEntity(dto: InMemoryRound): Round {
-        //TODO moze da sie jakos ladniej tego mappera zrobic ?
         val session = sessionRepository.findById(dto.gameAccessCode)
             .orElseThrow { IllegalArgumentException("Session not found: ${dto.gameAccessCode}") }
 
@@ -37,11 +35,8 @@ class RoundMapper(
 
         val selectedSymbols = symbolRepository.findAllById(dto.speakerPickedSymbolsIds)
 
-        val game = gameRepository.findById(session.gameId!!)
-            .orElseThrow { IllegalArgumentException("Game not found: ${session.gameId}") }
-
         val newRound = Round(
-            game = game,
+            gameId = session.gameId!!,
             listener = listener,
             speaker = speaker,
             topic = topic,
