@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 
 data class InMemoryGame(
-    var gameConfig: GameConfig,
-    var presentPlayers: MutableMap<UUID, Player> = ConcurrentHashMap(),
-    var gameRounds: MutableMap<UUID, InMemoryRound> = ConcurrentHashMap(),
+    val gameConfig: GameConfig,
+    val presentPlayers: MutableMap<UUID, Player> = ConcurrentHashMap(),
+    val gameRounds: MutableMap<UUID, InMemoryRound> = ConcurrentHashMap(),
 )

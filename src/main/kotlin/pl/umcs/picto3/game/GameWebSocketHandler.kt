@@ -476,10 +476,10 @@ class GameWebSocketHandler(
 
     private fun movePlayersToMatchMaker(
         playersToMoveBack: Set<Player?>,
-        delaySeconds: Long = 5
+        delaySeconds: Long = 5000
     ) { //TODO podmianka na wartosc z configa
         CoroutineScope(Dispatchers.IO).launch {
-            delay(delaySeconds * 1000)
+            delay(delaySeconds)
             playersToMoveBack.filterNotNull().forEach { player ->
                 matchMaker.addPlayerToQueue(player)
             }
@@ -491,7 +491,7 @@ class GameWebSocketHandler(
         roundService.saveNewRound(round)
     }
 
-    private fun saveAllGameRounds(accessCode: UUID) {
-        roundService.saveAllGameRounds(accessCode)
+    private fun saveAllGameRounds(gameId: UUID) {
+        roundService.saveAllGameRounds(gameId)
     }
 }
