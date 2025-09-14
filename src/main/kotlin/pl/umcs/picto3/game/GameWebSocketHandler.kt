@@ -27,6 +27,7 @@ import pl.umcs.picto3.game.communication.getRoundId
 import pl.umcs.picto3.game.communication.setAccessCode
 import pl.umcs.picto3.game.communication.setPlayerId
 import pl.umcs.picto3.game.communication.setRoundId
+import pl.umcs.picto3.image.InMemoryImage
 import pl.umcs.picto3.matchmaker.MatchMaker
 import pl.umcs.picto3.player.Player
 import pl.umcs.picto3.player.PlayerMessageType
@@ -114,10 +115,10 @@ class GameWebSocketHandler(
     fun initMatchMaker() {
         matchMaker.onPairReady = { p1, p2 ->
             val game = sessions[p2.sessionAccessCode]
-            val randomImages =
-                game?.gameConfig?.images?.shuffled()?.take(game.gameConfig.speakerImageCount.toInt())
-                    ?.mapNotNull { it.id }?.toSet() ?: emptySet()
-            val topicImageId = randomImages.randomOrNull() ?: UUID.randomUUID()
+            val randomImages = game?.gameConfig?.images?.shuffled()?.take(game.gameConfig.speakerImageCount.toInt())
+                ?.map { InMemoryImage(it.id!!, "/static/images/" + it.storedFileName) }?.toSet() ?: emptySet()
+
+            val topicImageId = randomImages.randomOrNull()?.imageId ?: UUID.randomUUID()
             val newRoundId = UUID.randomUUID()
             game?.gameRounds?.put(
                 newRoundId,
@@ -226,6 +227,11 @@ class GameWebSocketHandler(
                 PlayerMessageType.SPEAKER_SYMBOLS_PICKED.type -> {
                     val data = objectMapper.convertValue(messageWrapper.data, SpeakerSymbolsPickedData::class.java)
                     handleSpeakerPicks(wsSession.getAccessCode()!!, wsSession.getRoundId(), data)
+                    handleStateChangeForListener(
+                        wsSession.getAccessCode()!!,
+                        wsSession.getRoundId()!!,
+                        wsSession.getPlayerId()!!
+                    )
                     CoroutineScope(Dispatchers.IO).launch {
                         sendToSession(
                             wsSession,
@@ -296,7 +302,7 @@ class GameWebSocketHandler(
 
     private fun startRoundForSpeaker(
         wsSession: WebSocketSession?,
-        randomImages: Set<UUID>,
+        randomImages: Set<InMemoryImage>,
         topicImageId: UUID,
         symbolMatrix: SymbolMatrixDto,
         speakerAnswerTime: Int
@@ -350,6 +356,24 @@ class GameWebSocketHandler(
         )
         game.gameRounds[roundId] = updatedRound
         endRound(accessCode, roundId)
+    }
+
+    private fun handleStateChangeForListener(accessCode: String, roundId: UUID, speakerId: UUID) {
+        val session = sessions[accessCode]
+        val currentRound = session?.gameRounds[roundId]
+        val speaker = session?.presentPlayers[speakerId]
+        val listenerId = speaker?.lastOpponentId
+        val listener = session?.presentPlayers[listenerId]
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToSession(
+                listener?.wsSession,
+                GameMessage.LISTENER_STAGE_2.type,
+                mapOf(
+                    "randomImages" to (currentRound?.randomImages ?: emptySet()),
+                    "speakerPickedSymbolsIds" to (currentRound?.speakerPickedSymbolsIds ?: emptyList())
+                )
+            )
+        }
     }
 
     override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {

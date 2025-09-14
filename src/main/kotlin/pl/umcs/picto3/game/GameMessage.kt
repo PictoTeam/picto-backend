@@ -10,10 +10,8 @@ enum class GameMessage(val type: String) {
     SPEAKER_STAGE_2("SPEAKER_STAGE_2"),
 
     LISTENER_STAGE_1("LISTENER_STAGE_1"),
-    LISTENER_STAGE_2("LISTENER_STAGE_2"), //TODO weryfikacja bo gdzies stage musialem pomylic
+    LISTENER_STAGE_2("LISTENER_STAGE_2"),
 
-    // Admin events
-    ADMIN_CONNECTED("ADMIN_CONNECTED"),
 
     ROUND_RESULT("ROUND_RESULT"),
     GAME_STARTED("GAME_STARTED"),

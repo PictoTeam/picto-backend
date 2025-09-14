@@ -15,7 +15,7 @@ import java.util.UUID
 data class Session(
     @Id
     @Column(name = "id")
-    val id: String,
+    val accessCode: String,
 
     @Column(name = "game_id")
     val gameId: UUID? = null,
