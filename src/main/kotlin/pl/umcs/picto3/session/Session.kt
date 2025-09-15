@@ -18,7 +18,7 @@ data class Session(
     val accessCode: String,
 
     @Column(name = "game_id")
-    val gameId: UUID? = null,
+    var gameId: UUID? = null,
 
     @ManyToOne
     @JoinColumn(name = "game_config_id")

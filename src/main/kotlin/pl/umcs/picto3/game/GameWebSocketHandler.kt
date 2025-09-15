@@ -220,7 +220,7 @@ class GameWebSocketHandler(
                 PlayerMessageType.LISTENER_IMAGE_PICKED.type -> {
                     val data = objectMapper.convertValue(messageWrapper.data, ListenerImagePickedData::class.java)
                     handleListenerPick(
-                        wsSession.getAccessCode()!!, wsSession.getPlayerId(), data
+                        wsSession.getAccessCode()!!, wsSession.getRoundId(), data
                     )
                 }
 
