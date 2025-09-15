@@ -12,6 +12,8 @@ plugins {
 group = "pl.umcs"
 version = "0.0.1-SNAPSHOT"
 
+base.archivesName.set("picto-backend")
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(24)
@@ -32,6 +34,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 	implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 	implementation("org.liquibase:liquibase-core")
@@ -62,6 +65,11 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.jar {
+	enabled = false
+	archiveClassifier = ""
 }
 
 tasks.dokkaHtml.configure {
