@@ -133,7 +133,7 @@ class GameWebSocketHandler(
             )
             //setup p1 info
             p1.lastOpponentId = p2.id
-            p2.wsSession?.setRoundId(newRoundId)
+            p1.wsSession?.setRoundId(newRoundId)
             //setup p2 info
             p2.lastOpponentId = p1.id
             p2.wsSession?.setRoundId(newRoundId)
