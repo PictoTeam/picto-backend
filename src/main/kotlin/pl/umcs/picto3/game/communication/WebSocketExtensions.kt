@@ -26,4 +26,3 @@ fun WebSocketSession.setRoundId(roundId: UUID) {
 fun WebSocketSession.getRoundId(): UUID? {
     return this.attributes["roundId"] as? UUID
 }
-

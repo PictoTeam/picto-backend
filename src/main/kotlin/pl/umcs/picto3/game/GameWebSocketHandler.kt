@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -41,6 +42,7 @@ import pl.umcs.picto3.symbol.SymbolMatrixDto
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.get
 
 @Component
 class GameWebSocketHandler(
@@ -54,6 +56,8 @@ class GameWebSocketHandler(
     private val logger = KotlinLogging.logger {}
     private val sessions: MutableMap<String, InMemoryGame> =
         ConcurrentHashMap() //TODO nieironicznie tutaj redisa powinnismy uzyc
+
+    private val disconnectionTimeouts: MutableMap<UUID, Job> = ConcurrentHashMap()
 
     @EventListener
     fun handleSessionCreated(event: SessionCreatedEvent) {
@@ -160,28 +164,79 @@ class GameWebSocketHandler(
         }
     }
 
+    override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
+        val playerId = wsSession.getPlayerId()
+        val accessCode = wsSession.getAccessCode()
+
+        logger.info { "⬅️ Player disconnected from game [$accessCode], starting 10s timeout for reconnection" }
+
+        if (playerId != null) {
+            sessions[accessCode]?.presentPlayers[playerId]?.let { player ->
+                player.wsSession = null
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    sessions[accessCode]?.presentPlayers?.remove(playerId)
+
+                    if (wsSession.getRoundId() == null) {
+                        matchMaker.removePlayerFromQueue(player)
+                    } else {
+                        val game = sessions[accessCode]
+                        val disconnectedPlayerSession = game?.presentPlayers[playerId]?.wsSession!!
+                        emitPartnerDisconnectedEvent(disconnectedPlayerSession)
+
+                        matchMaker.addPlayerToQueue(game.presentPlayers[playerId]!!)
+
+                        sessions[accessCode]?.gameRounds?.remove(wsSession.getRoundId()) // TODO: unfinished rounds should be saved with appropriate flag
+                    }
+
+                    disconnectionTimeouts.remove(playerId)
+                    logger.info { "⏰ Player $playerId removed after 10s timeout" }
+                }
+            }
+        }
+    }
+
     private fun processConnectionUrl(wsSession: WebSocketSession) {
         val uri = wsSession.uri ?: throw Exception("Missing data in url")
-        val template = UriTemplate("/ws/games/{gameAccessCode}/{role}")
+        val path = uri.path
 
-        val variables = template.match(uri.path)
-        val accessCode = variables["gameAccessCode"]
-            ?: throw Exception("Missing gameAccessCode")
-        val role = variables["role"]
-            ?: throw Exception("Missing role")
-        wsSession.setAccessCode(accessCode)
-        if (sessions.containsKey(accessCode)) {
-            when (role) {
-                "player" -> {
-                    autoJoinAsPlayer(wsSession, accessCode)
-                } //TODO dorobienie wywyolania ze gracz wraca go gry musi podac swoj id w pathie
-//                TLDR: szukasz po id gracza z session players i podmieniasz adres websocketa + dodaje do puli
+        // TODO: if/how to do this better
+        // Reconnect
+        val reconnectTemplate = UriTemplate("/ws/games/{gameAccessCode}/player/{playerId}")
+        val reconnectVariables = try { reconnectTemplate.match(path) } catch (e: Exception) { emptyMap<String, String>() }
 
-                else -> throw Exception("Unknown role: $role.")
+        if (reconnectVariables.isNotEmpty()) {
+            val accessCode = reconnectVariables["gameAccessCode"] ?: throw Exception("Missing gameAccessCode")
+            val playerIdStr = reconnectVariables["playerId"] ?: throw Exception("Missing playerId")
+            val playerId = try { UUID.fromString(playerIdStr) } catch (e: Exception) { throw Exception("Invalid playerId format") }
+
+            wsSession.setAccessCode(accessCode)
+            if (sessions.containsKey(accessCode)) {
+                wsSession.setPlayerId(playerId)
+                matchMaker.addPlayerToQueue(sessions[accessCode]?.presentPlayers?.get(playerId)!!)
+            } else {
+                throw Exception("Session id does not match any active session")
             }
-        } else {
-            throw Exception("Session id does not match any active session")
+            return
         }
+
+        // Join as new player
+        val newPlayerTemplate = UriTemplate("/ws/games/{gameAccessCode}/player")
+        val newPlayerVariables = try { newPlayerTemplate.match(path) } catch (e: Exception) { emptyMap<String, String>() }
+
+        if (newPlayerVariables.isNotEmpty()) {
+            val accessCode = newPlayerVariables["gameAccessCode"] ?: throw Exception("Missing gameAccessCode")
+
+            wsSession.setAccessCode(accessCode)
+            if (sessions.containsKey(accessCode)) {
+                autoJoinAsPlayer(wsSession, accessCode)
+            } else {
+                throw Exception("Session id does not match any active session")
+            }
+            return
+        }
+
+        throw Exception("Invalid URL pattern")
     }
 
     private fun autoJoinAsPlayer(wsSession: WebSocketSession, gameSessionAccessCode: String) {
@@ -226,7 +281,7 @@ class GameWebSocketHandler(
 
                 PlayerMessageType.SPEAKER_SYMBOLS_PICKED.type -> {
                     val data = objectMapper.convertValue(messageWrapper.data, SpeakerSymbolsPickedData::class.java)
-                    handleSpeakerPicks(wsSession.getAccessCode()!!, wsSession.getRoundId(), data)
+                    handleSpeakerPicks(wsSession.getAccessCode()!!, wsSession.getRoundId()!!, data)
                     handleStateChangeForListener(
                         wsSession.getAccessCode()!!,
                         wsSession.getRoundId()!!,
@@ -261,7 +316,7 @@ class GameWebSocketHandler(
         }
     }
 
-    private fun handleSpeakerPicks(accessCode: String, roundId: UUID?, data: SpeakerSymbolsPickedData) {
+    private fun handleSpeakerPicks(accessCode: String, roundId: UUID, data: SpeakerSymbolsPickedData) {
         if (roundId == null) {
             logger.warn { "Round ID is null for access code: $accessCode" }
             return
@@ -376,14 +431,6 @@ class GameWebSocketHandler(
         }
     }
 
-    override fun afterConnectionClosed(wsSession: WebSocketSession, status: CloseStatus) {
-        sessions[wsSession.getAccessCode()]?.presentPlayers[wsSession.getPlayerId()]?.let {
-            it.wsSession = null
-            matchMaker.removePlayerFromQueue(it)
-        }
-        logger.info { "⬅️ Player disconnected from game [${wsSession.getAccessCode()}]" }
-    }
-
     private suspend fun sendToMultipleSessions(
         sessions: Set<WebSocketSession?>,
         type: String,
@@ -493,5 +540,17 @@ class GameWebSocketHandler(
 
     private fun saveAllGameRounds(gameId: UUID) {
         roundService.saveAllGameRounds(gameId)
+    }
+
+    private fun emitPartnerDisconnectedEvent(wsSession: WebSocketSession) {
+        CoroutineScope(Dispatchers.IO).launch {
+            sendToSession(
+                wsSession,
+                GameMessage.PLAYER_LEFT.type,
+                mapOf(
+                    "message" to "Your partner has disconnected",
+                )
+            )
+        }
     }
 }
