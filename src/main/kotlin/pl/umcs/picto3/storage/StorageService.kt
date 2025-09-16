@@ -8,6 +8,7 @@ import pl.umcs.picto3.image.Image
 import pl.umcs.picto3.image.ImageDto
 import pl.umcs.picto3.image.ImageMapper
 import pl.umcs.picto3.image.ImageRepository
+import pl.umcs.picto3.session.SessionService
 import pl.umcs.picto3.symbol.Symbol
 import pl.umcs.picto3.symbol.SymbolDto
 import pl.umcs.picto3.symbol.SymbolMapper
@@ -22,7 +23,8 @@ class StorageService(
     private val gameService: GameService,
     private val storage: Storage,
     private val imageMapper: ImageMapper,
-    private val symbolMapper: SymbolMapper
+    private val symbolMapper: SymbolMapper,
+    private val sessionService: SessionService
 ) {
 
     @Transactional
@@ -52,7 +54,7 @@ class StorageService(
 
     @Transactional(readOnly = true)
     fun getSymbolsForGameWithSessionAccessCode(sessionAccessCode: String): SymbolMatrixDto {
-        val symbolsForGame = gameService.getSymbolsForGame(sessionAccessCode)
+        val symbolsForGame = sessionService.getSymbolsForSession(sessionAccessCode)
         return symbolMapper.toSymbolMatrixDto(symbolsForGame)
     }
 

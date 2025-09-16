@@ -8,6 +8,7 @@ import pl.umcs.picto3.game.GameFinishedEvent
 import pl.umcs.picto3.game.GameRepository
 import pl.umcs.picto3.game.GameStartedEvent
 import pl.umcs.picto3.gameconfig.GameConfigRepository
+import pl.umcs.picto3.symbol.SymbolMatrix
 import java.util.UUID
 
 @Service
@@ -28,6 +29,11 @@ class SessionService(
         return newCreatedSessionAccessCode
     }
 
+    fun getSymbolsForSession(accessCode: String): SymbolMatrix {
+        return sessionRepository.findById(accessCode).orElseThrow {
+            IllegalArgumentException("Session with code: $accessCode not found")
+        }.gameConfig.symbols
+    }
 
     fun startGameInSessionWithGivenAccessCode(accessCode: String) {
         val sessionToStartGame = sessionRepository.findById(accessCode).orElseThrow {
