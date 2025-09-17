@@ -262,6 +262,7 @@ class GameWebSocketHandler(
                     GameMessage.PLAYER_WELCOME.type,
                     mapOf(
                         "playerWelcomeMessage" to "Welcome to picto game!",
+                        "playerId" to newPlayer.id
                     )
                 )
             }
